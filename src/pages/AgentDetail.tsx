@@ -113,8 +113,16 @@ const AgentDetail = () => {
             <div className="bg-card rounded-xl border border-border p-5 sticky top-20">
               <h3 className="text-base font-semibold text-foreground mb-4">Информация</h3>
               <div className="space-y-3 text-sm">
-                <InfoRow label="Версия:" value={String(agent.info.version)} />
-                <InfoRow label="Пром:" value={agent.info.prom} />
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-semibold text-foreground">Версия {agent.info.version}</span>
+                    <StatusBadge status={agent.info.versionStatus} />
+                  </div>
+                  <div className="text-muted-foreground mt-1">
+                    <span className="font-medium text-foreground">Оценено:</span>{" "}
+                    {agent.info.evaluatedAt ?? "—"}
+                  </div>
+                </div>
                 <div className="flex justify-between items-center">
                   <span className="text-muted-foreground">Статус:</span>
                   <StatusBadge status={agent.info.statusText} />
