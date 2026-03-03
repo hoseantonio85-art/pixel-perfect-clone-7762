@@ -1,0 +1,267 @@
+export interface Agent {
+  id: string;
+  name: string;
+  code: string;
+  division: string;
+  department: string;
+  version: number;
+  lastModified: string;
+  status: "awaiting" | "approved" | "review" | "none";
+  riskLevel?: "critical" | "high" | "medium" | "low";
+  info: {
+    version: number;
+    prom: string;
+    statusText: string;
+    ke: string;
+    cra: string;
+    lifecycle: string;
+    created: string;
+    daysInWork: number;
+    responsible: string;
+    owner: string;
+    description: string;
+  };
+  risks: Risk[];
+}
+
+export interface Risk {
+  id: string;
+  code: string;
+  title: string;
+  level: "critical" | "high" | "medium" | "low";
+  status: string;
+  description: string;
+  comment: string;
+}
+
+export const agents: Agent[] = [
+  {
+    id: "1",
+    name: "Агент клонирования диалога с бизнесом",
+    code: "CI10112914",
+    division: 'Дивизион "Опер центр"',
+    department: "Клеть продаж",
+    version: 1,
+    lastModified: "24.12.2024",
+    status: "awaiting",
+    info: {
+      version: 1,
+      prom: "Нет",
+      statusText: "Согласование",
+      ke: "CI10112914",
+      cra: "CRA-1000",
+      lifecycle: "Страховка",
+      created: "24.09.2025",
+      daysInWork: 1,
+      responsible: "Вурхиз Н.Н.",
+      owner: "Майерз М.Н.",
+      description: "Текстовое поле с описанием версии Агента",
+    },
+    risks: [
+      {
+        id: "r1",
+        code: "CRA-12323",
+        title: "Отказ инфраструктуры ИИ - платформ и сервисов",
+        level: "high",
+        status: "Не применим",
+        description: "Одностороннее изменение условий договора о выпуске и обслуживании банковской карты, договора оказания услуги «Уведомления по операциям», а также условий предоставления тарифных планов и пакетов услуг стороной, осуществляющей предпринимательскую деятельность.\n\nТакие действия могут быть расценены как нарушение прав потребителей и привести к снижению доверия клиентов к компании.",
+        comment: "Здесь сотрудник сообщает почему оценка данного вида риска требует корректировки и имеет статус не применим",
+      },
+      {
+        id: "r2",
+        code: "CRA-12324",
+        title: "Взаимное влияние ИИ решений на едином ландшафте",
+        level: "medium",
+        status: "",
+        description: "В августе 2022 в рамках сублицензионного договора осуществлена закупка лицензий ПО Kizen, но никаких файловых ...",
+        comment: "",
+      },
+      {
+        id: "r3",
+        code: "CRA-12325",
+        title: "Уязвимости конфигурации и цепочки поставок",
+        level: "low",
+        status: "",
+        description: "В августе 2022 в рамках сублицензионного договора осуществлена закупка лицензий ПО Kizen, но никаких файловых ...",
+        comment: "",
+      },
+      {
+        id: "r4",
+        code: "CRA-12326",
+        title: "Прямые промпт-инъекции и манипуляции выводом модели",
+        level: "high",
+        status: "",
+        description: "В августе 2022 в рамках сублицензионного договора осуществлена закупка лицензий ПО Kizen, но никаких файловых ...",
+        comment: "",
+      },
+      {
+        id: "r5",
+        code: "CRA-12327",
+        title: "Не прямые промпт-инъекции (через данные и RAG)",
+        level: "medium",
+        status: "",
+        description: "В августе 2022 в рамках сублицензионного договора осуществлена закупка лицензий ПО Kizen, но никаких файловых ...",
+        comment: "",
+      },
+      {
+        id: "r6",
+        code: "CRA-12328",
+        title: "Утечка конфиденциальных данных через модель",
+        level: "critical",
+        status: "",
+        description: "Возможность утечки данных через взаимодействие с языковой моделью.",
+        comment: "",
+      },
+      {
+        id: "r7",
+        code: "CRA-12329",
+        title: "Некорректная генерация контента",
+        level: "medium",
+        status: "",
+        description: "Модель может генерировать некорректный или вредоносный контент.",
+        comment: "",
+      },
+      {
+        id: "r8",
+        code: "CRA-12330",
+        title: "Недостаточный мониторинг и аудит",
+        level: "low",
+        status: "",
+        description: "Отсутствие мониторинга действий ИИ-агента.",
+        comment: "",
+      },
+      {
+        id: "r9",
+        code: "CRA-12331",
+        title: "Нарушение регуляторных требований",
+        level: "high",
+        status: "",
+        description: "Несоответствие требованиям регулятора в части использования ИИ.",
+        comment: "",
+      },
+      {
+        id: "r10",
+        code: "CRA-12332",
+        title: "Отказ в обслуживании ИИ-сервиса",
+        level: "medium",
+        status: "",
+        description: "Возможность DoS-атаки на ИИ-сервис.",
+        comment: "",
+      },
+      {
+        id: "r11",
+        code: "CRA-12333",
+        title: "Несанкционированный доступ к модели",
+        level: "critical",
+        status: "",
+        description: "Возможность несанкционированного доступа.",
+        comment: "",
+      },
+      {
+        id: "r12",
+        code: "CRA-12334",
+        title: "Ошибки в обучающих данных",
+        level: "low",
+        status: "",
+        description: "Наличие ошибок или предвзятости в данных обучения.",
+        comment: "",
+      },
+      {
+        id: "r13",
+        code: "CRA-12335",
+        title: "Репутационные риски",
+        level: "medium",
+        status: "",
+        description: "Риски для репутации компании при использовании ИИ.",
+        comment: "",
+      },
+    ],
+  },
+  {
+    id: "2",
+    name: "ИИ-агент в процесс регистрация самозанятого в сервисе Чужое дело",
+    code: "CI10112914",
+    division: "Дивизион «Опер центр»",
+    department: "Клеть продаж",
+    version: 1,
+    lastModified: "24.12.2024",
+    status: "approved",
+    riskLevel: "high",
+    info: {
+      version: 1,
+      prom: "Нет",
+      statusText: "Согласовано",
+      ke: "CI10112914",
+      cra: "CRA-1001",
+      lifecycle: "Продакшн",
+      created: "20.09.2025",
+      daysInWork: 5,
+      responsible: "Иванов И.И.",
+      owner: "Петров П.П.",
+      description: "ИИ-агент для автоматизации регистрации самозанятых.",
+    },
+    risks: [],
+  },
+  {
+    id: "3",
+    name: "Агент сервисов розыска",
+    code: "CI10112914",
+    division: "Розовое взыскание",
+    department: "Подразделение по работе",
+    version: 1,
+    lastModified: "24.12.2024",
+    status: "review",
+    info: {
+      version: 1,
+      prom: "Да",
+      statusText: "Оценка",
+      ke: "CI10112914",
+      cra: "CRA-1002",
+      lifecycle: "Тестирование",
+      created: "18.09.2025",
+      daysInWork: 7,
+      responsible: "Сидоров С.С.",
+      owner: "Козлов К.К.",
+      description: "Агент для автоматизации сервисов розыска.",
+    },
+    risks: [],
+  },
+  {
+    id: "4",
+    name: "Credit cards.Debt",
+    code: "CI10112914",
+    division: "Финансы",
+    department: "Кредитный отдел",
+    version: 2,
+    lastModified: "23.12.2024",
+    status: "review",
+    info: {
+      version: 2,
+      prom: "Нет",
+      statusText: "Оценка",
+      ke: "CI10112914",
+      cra: "CRA-1003",
+      lifecycle: "Разработка",
+      created: "15.09.2025",
+      daysInWork: 10,
+      responsible: "Смирнов А.А.",
+      owner: "Волков В.В.",
+      description: "Агент для управления кредитными картами.",
+    },
+    risks: [],
+  },
+];
+
+export interface VersionHistory {
+  version: string;
+  status: string;
+  riskLevel: string;
+  bigRisks: number;
+  smallRisks: number;
+}
+
+export const versionHistory: VersionHistory[] = [
+  { version: "Версия 3.4", status: "Пром", riskLevel: "Низкий", bigRisks: 5, smallRisks: 3 },
+  { version: "Версия 3.3", status: "Архив", riskLevel: "Низкий", bigRisks: 5, smallRisks: 3 },
+  { version: "Версия 3.2", status: "Архив", riskLevel: "Низкий", bigRisks: 5, smallRisks: 3 },
+];
