@@ -66,7 +66,12 @@ export const agents: Agent[] = [
       responsible: "Вурхиз Н.Н.",
       owner: "Майерз М.Н.",
       description: "Текстовое поле с описанием версии Агента",
-    },
+      qgm: {
+        flag: "PASS",
+        lastSuccessSync: "18.02.2026 · 14:33",
+        sentValue: "PASS",
+        syncStatus: "Успешно",
+      },
     risks: [
       {
         id: "r1",
