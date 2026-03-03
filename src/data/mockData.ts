@@ -9,8 +9,9 @@ export interface Agent {
   status: "awaiting" | "approved" | "review" | "none";
   riskLevel?: "critical" | "high" | "medium" | "low";
   info: {
-    version: number;
-    prom: string;
+    version: string;
+    versionStatus: "Пром" | "Разработка";
+    evaluatedAt: string | null;
     statusText: string;
     ke: string;
     cra: string;
@@ -45,8 +46,9 @@ export const agents: Agent[] = [
     lastModified: "24.12.2024",
     status: "awaiting",
     info: {
-      version: 1,
-      prom: "Нет",
+      version: "1.2",
+      versionStatus: "Разработка",
+      evaluatedAt: "18.02.2026 · 14:32",
       statusText: "Согласование",
       ke: "CI10112914",
       cra: "CRA-1000",
@@ -188,8 +190,9 @@ export const agents: Agent[] = [
     status: "approved",
     riskLevel: "high",
     info: {
-      version: 1,
-      prom: "Нет",
+      version: "1.0",
+      versionStatus: "Пром",
+      evaluatedAt: "20.01.2026 · 10:15",
       statusText: "Согласовано",
       ke: "CI10112914",
       cra: "CRA-1001",
@@ -212,8 +215,9 @@ export const agents: Agent[] = [
     lastModified: "24.12.2024",
     status: "review",
     info: {
-      version: 1,
-      prom: "Да",
+      version: "1.0",
+      versionStatus: "Разработка",
+      evaluatedAt: null,
       statusText: "Оценка",
       ke: "CI10112914",
       cra: "CRA-1002",
@@ -236,8 +240,9 @@ export const agents: Agent[] = [
     lastModified: "23.12.2024",
     status: "review",
     info: {
-      version: 2,
-      prom: "Нет",
+      version: "2.1",
+      versionStatus: "Разработка",
+      evaluatedAt: null,
       statusText: "Оценка",
       ke: "CI10112914",
       cra: "CRA-1003",

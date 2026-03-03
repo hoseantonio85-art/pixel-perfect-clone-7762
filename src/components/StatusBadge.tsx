@@ -21,6 +21,12 @@ const StatusBadge = ({ status, variant = "outlined" }: StatusBadgeProps) => {
     case "Согласование":
       colorClasses = "bg-primary/10 text-primary border-primary/30";
       break;
+    case "Пром":
+      colorClasses = "bg-primary/10 text-primary border-primary/30";
+      break;
+    case "Разработка":
+      colorClasses = "bg-primary/10 text-primary border-primary/30";
+      break;
     default:
       colorClasses = "bg-muted text-muted-foreground border-border";
   }
