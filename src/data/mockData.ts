@@ -190,8 +190,9 @@ export const agents: Agent[] = [
     status: "approved",
     riskLevel: "high",
     info: {
-      version: 1,
-      prom: "Нет",
+      version: "1.0",
+      versionStatus: "Пром",
+      evaluatedAt: "20.01.2026 · 10:15",
       statusText: "Согласовано",
       ke: "CI10112914",
       cra: "CRA-1001",
