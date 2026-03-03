@@ -1,3 +1,10 @@
+export interface QGMIntegration {
+  flag: "PASS" | "ERR";
+  lastSuccessSync: string | null;
+  sentValue: "PASS" | "ERR";
+  syncStatus: "Успешно" | "Ошибка";
+}
+
 export interface Agent {
   id: string;
   name: string;
@@ -21,6 +28,7 @@ export interface Agent {
     responsible: string;
     owner: string;
     description: string;
+    qgm?: QGMIntegration;
   };
   risks: Risk[];
 }
@@ -58,6 +66,12 @@ export const agents: Agent[] = [
       responsible: "Вурхиз Н.Н.",
       owner: "Майерз М.Н.",
       description: "Текстовое поле с описанием версии Агента",
+      qgm: {
+        flag: "PASS",
+        lastSuccessSync: "18.02.2026 · 14:33",
+        sentValue: "PASS",
+        syncStatus: "Успешно",
+      },
     },
     risks: [
       {
@@ -202,6 +216,12 @@ export const agents: Agent[] = [
       responsible: "Иванов И.И.",
       owner: "Петров П.П.",
       description: "ИИ-агент для автоматизации регистрации самозанятых.",
+      qgm: {
+        flag: "ERR",
+        lastSuccessSync: "18.02.2026 · 12:01",
+        sentValue: "ERR",
+        syncStatus: "Ошибка",
+      },
     },
     risks: [],
   },

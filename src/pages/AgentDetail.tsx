@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Sparkles, X, ChevronRight, Edit, QrCode, RotateCcw } from "lucide-react";
+import { ArrowLeft, Sparkles, X, ChevronRight, Edit, QrCode, RotateCcw, AlertTriangle } from "lucide-react";
 import AppLayout from "@/components/AppLayout";
 import RiskBadge from "@/components/RiskBadge";
 import StatusBadge from "@/components/StatusBadge";
@@ -47,6 +47,16 @@ const AgentDetail = () => {
                       Проверь и скорректируй их при необходимости. Некоторые риски нужно оценить у ответственных подразделений, мы подскажем как это сделать.
                     </div>
                   </div>
+                </div>
+              </div>
+            )}
+
+            {/* QGM Error Banner */}
+            {agent.info.qgm?.syncStatus === "Ошибка" && (
+              <div className="bg-destructive/10 border border-destructive/20 rounded-xl p-4 mb-6">
+                <div className="flex items-center gap-2">
+                  <AlertTriangle className="w-4 h-4 text-destructive" />
+                  <span className="text-sm font-medium text-destructive">Ошибка синхронизации QGM</span>
                 </div>
               </div>
             )}
@@ -264,6 +274,22 @@ const AgentDetail = () => {
                     </div>
                     <span className="text-xs text-muted-foreground">25 Мб</span>
                   </div>
+
+                  {/* QGM Integration block */}
+                  {agent.info.qgm && (
+                    <>
+                      <h3 className="text-base font-semibold text-foreground mb-3">Интеграции</h3>
+                      <div className="bg-muted rounded-lg p-4 mb-6">
+                        <div className="text-sm font-semibold text-foreground mb-3">QGM</div>
+                        <div className="space-y-2 text-sm">
+                          <InfoRow label="Флаг" value={agent.info.qgm.flag} />
+                          <InfoRow label="Последняя успешная синхронизация" value={agent.info.qgm.lastSuccessSync ?? "—"} />
+                          <InfoRow label="Значение, отправленное в QGM" value={agent.info.qgm.sentValue} />
+                          <InfoRow label="Статус синхронизации" value={agent.info.qgm.syncStatus} />
+                        </div>
+                      </div>
+                    </>
+                  )}
 
                   <button className="w-full h-10 rounded-lg border border-border text-sm text-foreground flex items-center justify-center gap-2 hover:bg-muted transition-colors">
                     <Edit className="w-4 h-4" /> Редактировать
