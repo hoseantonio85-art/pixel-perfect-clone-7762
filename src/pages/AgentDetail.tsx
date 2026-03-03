@@ -182,7 +182,6 @@ const AgentDetail = () => {
                 </button>
               </div>
             </div>
-            </div>
           </div>
         </div>
       </div>
