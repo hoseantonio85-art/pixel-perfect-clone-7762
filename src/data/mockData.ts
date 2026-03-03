@@ -215,8 +215,9 @@ export const agents: Agent[] = [
     lastModified: "24.12.2024",
     status: "review",
     info: {
-      version: 1,
-      prom: "Да",
+      version: "1.0",
+      versionStatus: "Разработка",
+      evaluatedAt: null,
       statusText: "Оценка",
       ke: "CI10112914",
       cra: "CRA-1002",
