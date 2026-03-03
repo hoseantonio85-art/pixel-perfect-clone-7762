@@ -9,8 +9,9 @@ export interface Agent {
   status: "awaiting" | "approved" | "review" | "none";
   riskLevel?: "critical" | "high" | "medium" | "low";
   info: {
-    version: number;
-    prom: string;
+    version: string;
+    versionStatus: "Пром" | "Разработка";
+    evaluatedAt: string | null;
     statusText: string;
     ke: string;
     cra: string;
