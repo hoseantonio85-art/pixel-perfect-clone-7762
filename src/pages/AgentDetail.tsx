@@ -54,9 +54,14 @@ const AgentDetail = () => {
             {/* QGM Error Banner */}
             {agent.info.qgm?.syncStatus === "Ошибка" && (
               <div className="bg-destructive/10 border border-destructive/20 rounded-xl p-4 mb-6">
-                <div className="flex items-center gap-2">
-                  <AlertTriangle className="w-4 h-4 text-destructive" />
-                  <span className="text-sm font-medium text-destructive">Ошибка синхронизации QGM</span>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <AlertTriangle className="w-4 h-4 text-destructive" />
+                    <span className="text-sm font-medium text-destructive">Ошибка синхронизации QGM</span>
+                  </div>
+                  <button onClick={() => setShowVersionDetail(true)} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                    Подробнее →
+                  </button>
                 </div>
               </div>
             )}
