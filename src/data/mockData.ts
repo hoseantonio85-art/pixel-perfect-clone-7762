@@ -1,3 +1,10 @@
+export interface QGMIntegration {
+  flag: "PASS" | "ERR";
+  lastSuccessSync: string | null;
+  sentValue: "PASS" | "ERR";
+  syncStatus: "Успешно" | "Ошибка";
+}
+
 export interface Agent {
   id: string;
   name: string;
@@ -21,6 +28,7 @@ export interface Agent {
     responsible: string;
     owner: string;
     description: string;
+    qgm?: QGMIntegration;
   };
   risks: Risk[];
 }
