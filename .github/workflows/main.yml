@@ -1,4 +1,4 @@
-Deploy to GitHub Pages
+name: Deploy to GitHub Pages
 
 on:
   # Триггер: запускать при пуше в main (или master)
