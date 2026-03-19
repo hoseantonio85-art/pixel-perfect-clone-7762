@@ -33,6 +33,27 @@ export interface Agent {
   risks: Risk[];
 }
 
+export interface RiskQuote {
+  source: string;
+  text: string;
+}
+
+export interface RiskFactor {
+  code: string;
+  title: string;
+  weight: number;
+  isDual?: boolean;
+  quotes: RiskQuote[];
+}
+
+export interface RiskMeasure {
+  code: string;
+  title: string;
+  weight: number;
+  isDual?: boolean;
+  quotes: RiskQuote[];
+}
+
 export interface Risk {
   id: string;
   code: string;
@@ -41,6 +62,10 @@ export interface Risk {
   status: string;
   description: string;
   comment: string;
+  reasoning?: string;
+  finalRiskScore?: number;
+  reasoningRaw?: RiskFactor[];
+  measures?: RiskMeasure[];
 }
 
 export const agents: Agent[] = [
