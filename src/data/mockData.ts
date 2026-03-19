@@ -169,6 +169,39 @@ export const agents: Agent[] = [
         status: "",
         description: "В августе 2022 в рамках сублицензионного договора осуществлена закупка лицензий ПО Kizen, но никаких файловых ...",
         comment: "",
+        reasoning: "Обнаружены потенциальные конфликты между несколькими ИИ-агентами, работающими на общей инфраструктуре. Взаимное влияние может привести к деградации качества.",
+        finalRiskScore: 7.2,
+        reasoningRaw: [
+          {
+            code: "UFR-010",
+            title: "Общие ресурсы GPU между агентами",
+            weight: 1.2,
+            isDual: false,
+            quotes: [
+              { source: "Infra.docx", text: "Все агенты используют единый кластер GPU" },
+            ],
+          },
+          {
+            code: "UFR-011",
+            title: "Отсутствие изоляции данных между моделями",
+            weight: 0.9,
+            isDual: true,
+            quotes: [
+              { source: "Security.pdf", text: "Данные training pipeline не разделены" },
+            ],
+          },
+        ],
+        measures: [
+          {
+            code: "UMF-110",
+            title: "Namespace-изоляция в Kubernetes",
+            weight: 1.8,
+            isDual: false,
+            quotes: [
+              { source: "Arch.pdf", text: "Каждый агент в отдельном namespace" },
+            ],
+          },
+        ],
       },
       {
         id: "r3",
@@ -187,6 +220,30 @@ export const agents: Agent[] = [
         status: "",
         description: "В августе 2022 в рамках сублицензионного договора осуществлена закупка лицензий ПО Kizen, но никаких файловых ...",
         comment: "",
+        reasoning: "Выявлена высокая вероятность успешной промпт-инъекции через пользовательский ввод без надлежащей фильтрации.",
+        finalRiskScore: 14.1,
+        reasoningRaw: [
+          {
+            code: "UFR-020",
+            title: "Отсутствие входной валидации промптов",
+            weight: 2.0,
+            isDual: false,
+            quotes: [
+              { source: "BT.docx", text: "Пользовательский ввод передаётся напрямую в модель" },
+            ],
+          },
+        ],
+        measures: [
+          {
+            code: "UMF-120",
+            title: "Промежуточный слой фильтрации",
+            weight: 1.5,
+            isDual: false,
+            quotes: [
+              { source: "Security.pdf", text: "Реализован базовый фильтр ключевых слов" },
+            ],
+          },
+        ],
       },
       {
         id: "r5",

@@ -403,7 +403,7 @@ const InfoRow = ({ label, value }: { label: string; value: string }) => (
 );
 
 const FactorCard = ({ item }: { item: RiskFactor | RiskMeasure }) => (
-  <div className="bg-muted rounded-lg p-4">
+  <div className="bg-card rounded-lg border border-border p-4">
     <div className="flex items-start justify-between gap-2 mb-1">
       <div className="text-sm font-medium text-foreground">{item.title}</div>
       {item.isDual && (
@@ -416,11 +416,11 @@ const FactorCard = ({ item }: { item: RiskFactor | RiskMeasure }) => (
       {item.code} · вес {item.weight.toFixed(1)}
     </div>
     {item.quotes.length > 0 && (
-      <div className="space-y-1.5">
+      <div className="space-y-2">
         {item.quotes.map((q, i) => (
-          <div key={i} className="text-xs">
-            <span className="text-muted-foreground">{q.source}</span>
-            <div className="text-foreground italic">«{q.text}»</div>
+          <div key={i} className="border-l-2 border-primary/30 pl-3">
+            <div className="text-xs text-muted-foreground">{q.source}</div>
+            <div className="text-xs text-foreground italic">«{q.text}»</div>
           </div>
         ))}
       </div>
