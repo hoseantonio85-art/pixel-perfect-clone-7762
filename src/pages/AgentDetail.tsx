@@ -4,7 +4,7 @@ import { ArrowLeft, Sparkles, X, ChevronRight, Edit, QrCode, RotateCcw, AlertTri
 import AppLayout from "@/components/AppLayout";
 import RiskBadge from "@/components/RiskBadge";
 import StatusBadge from "@/components/StatusBadge";
-import { agents, versionHistory, type Risk } from "@/data/mockData";
+import { agents, versionHistory, type Risk, type RiskFactor, type RiskMeasure } from "@/data/mockData";
 
 const AgentDetail = () => {
   const { id } = useParams();
