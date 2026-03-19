@@ -213,6 +213,49 @@ const AgentDetail = () => {
                 </div>
               </div>
 
+              {/* AI Reasoning */}
+              {selectedRisk.reasoning && (
+                <div className="mb-6">
+                  <h3 className="text-base font-semibold text-foreground mb-2 flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-primary" />
+                    AI-обоснование
+                  </h3>
+                  <div className="bg-muted rounded-lg p-4">
+                    <p className="text-sm text-foreground mb-2">{selectedRisk.reasoning}</p>
+                    {selectedRisk.finalRiskScore !== undefined && (
+                      <div className="text-sm">
+                        <span className="text-muted-foreground">Балл: </span>
+                        <span className="font-semibold text-foreground">{selectedRisk.finalRiskScore}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Risk Factors */}
+              {selectedRisk.reasoningRaw && selectedRisk.reasoningRaw.length > 0 && (
+                <div className="mb-6">
+                  <h3 className="text-base font-semibold text-foreground mb-3">Что повлияло на оценку</h3>
+                  <div className="space-y-3">
+                    {selectedRisk.reasoningRaw.map((factor) => (
+                      <FactorCard key={factor.code} item={factor} />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Risk Measures */}
+              {selectedRisk.measures && selectedRisk.measures.length > 0 && (
+                <div className="mb-6">
+                  <h3 className="text-base font-semibold text-foreground mb-3">Что снижает риск</h3>
+                  <div className="space-y-3">
+                    {selectedRisk.measures.map((measure) => (
+                      <FactorCard key={measure.code} item={measure} />
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <div className="mb-6">
                 <h3 className="text-base font-semibold text-foreground mb-2">Данные риска</h3>
                 <div className="text-xs text-muted-foreground mb-1">Обоснование уровня риска</div>
