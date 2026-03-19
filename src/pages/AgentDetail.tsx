@@ -4,7 +4,7 @@ import { ArrowLeft, Sparkles, X, ChevronRight, Edit, QrCode, RotateCcw, AlertTri
 import AppLayout from "@/components/AppLayout";
 import RiskBadge from "@/components/RiskBadge";
 import StatusBadge from "@/components/StatusBadge";
-import { agents, versionHistory, type Risk } from "@/data/mockData";
+import { agents, versionHistory, type Risk, type RiskFactor, type RiskMeasure } from "@/data/mockData";
 
 const AgentDetail = () => {
   const { id } = useParams();
@@ -213,6 +213,49 @@ const AgentDetail = () => {
                 </div>
               </div>
 
+              {/* AI Reasoning */}
+              {selectedRisk.reasoning && (
+                <div className="mb-6">
+                  <h3 className="text-base font-semibold text-foreground mb-2 flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-primary" />
+                    AI-обоснование
+                  </h3>
+                  <div className="bg-muted rounded-lg p-4">
+                    <p className="text-sm text-foreground mb-2">{selectedRisk.reasoning}</p>
+                    {selectedRisk.finalRiskScore !== undefined && (
+                      <div className="text-sm">
+                        <span className="text-muted-foreground">Балл: </span>
+                        <span className="font-semibold text-foreground">{selectedRisk.finalRiskScore}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Risk Factors */}
+              {selectedRisk.reasoningRaw && selectedRisk.reasoningRaw.length > 0 && (
+                <div className="mb-6">
+                  <h3 className="text-base font-semibold text-foreground mb-3">Что повлияло на оценку</h3>
+                  <div className="space-y-3">
+                    {selectedRisk.reasoningRaw.map((factor) => (
+                      <FactorCard key={factor.code} item={factor} />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Risk Measures */}
+              {selectedRisk.measures && selectedRisk.measures.length > 0 && (
+                <div className="mb-6">
+                  <h3 className="text-base font-semibold text-foreground mb-3">Что снижает риск</h3>
+                  <div className="space-y-3">
+                    {selectedRisk.measures.map((measure) => (
+                      <FactorCard key={measure.code} item={measure} />
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <div className="mb-6">
                 <h3 className="text-base font-semibold text-foreground mb-2">Данные риска</h3>
                 <div className="text-xs text-muted-foreground mb-1">Обоснование уровня риска</div>
@@ -356,6 +399,32 @@ const InfoRow = ({ label, value }: { label: string; value: string }) => (
   <div className="flex justify-between">
     <span className="text-muted-foreground">{label}</span>
     <span className="font-medium text-foreground">{value}</span>
+  </div>
+);
+
+const FactorCard = ({ item }: { item: RiskFactor | RiskMeasure }) => (
+  <div className="bg-muted rounded-lg p-4">
+    <div className="flex items-start justify-between gap-2 mb-1">
+      <div className="text-sm font-medium text-foreground">{item.title}</div>
+      {item.isDual && (
+        <span className="shrink-0 text-[10px] px-1.5 py-0.5 rounded bg-accent text-accent-foreground">
+          Требует контекста
+        </span>
+      )}
+    </div>
+    <div className="text-xs text-muted-foreground mb-3">
+      {item.code} · вес {item.weight.toFixed(1)}
+    </div>
+    {item.quotes.length > 0 && (
+      <div className="space-y-1.5">
+        {item.quotes.map((q, i) => (
+          <div key={i} className="text-xs">
+            <span className="text-muted-foreground">{q.source}</span>
+            <div className="text-foreground italic">«{q.text}»</div>
+          </div>
+        ))}
+      </div>
+    )}
   </div>
 );
 
