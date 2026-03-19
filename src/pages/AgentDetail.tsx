@@ -402,4 +402,30 @@ const InfoRow = ({ label, value }: { label: string; value: string }) => (
   </div>
 );
 
+const FactorCard = ({ item }: { item: RiskFactor | RiskMeasure }) => (
+  <div className="bg-muted rounded-lg p-4">
+    <div className="flex items-start justify-between gap-2 mb-1">
+      <div className="text-sm font-medium text-foreground">{item.title}</div>
+      {item.isDual && (
+        <span className="shrink-0 text-[10px] px-1.5 py-0.5 rounded bg-accent text-accent-foreground">
+          Требует контекста
+        </span>
+      )}
+    </div>
+    <div className="text-xs text-muted-foreground mb-3">
+      {item.code} · вес {item.weight.toFixed(1)}
+    </div>
+    {item.quotes.length > 0 && (
+      <div className="space-y-1.5">
+        {item.quotes.map((q, i) => (
+          <div key={i} className="text-xs">
+            <span className="text-muted-foreground">{q.source}</span>
+            <div className="text-foreground italic">«{q.text}»</div>
+          </div>
+        ))}
+      </div>
+    )}
+  </div>
+);
+
 export default AgentDetail;
