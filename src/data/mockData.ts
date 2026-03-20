@@ -156,6 +156,7 @@ export const agents: Agent[] = [
             title: "Резервный канал обработки запросов",
             weight: 1.5,
             isDual: true,
+            factorCode: "UFR-002",
             quotes: [
               { source: "Arch.pdf", text: "Предусмотрен ручной режим обработки" },
               { source: "BT.docx", text: "Описан процесс эскалации" },
