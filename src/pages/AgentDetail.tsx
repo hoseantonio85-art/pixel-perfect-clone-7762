@@ -236,26 +236,10 @@ const AgentDetail = () => {
               {selectedRisk.reasoningRaw && selectedRisk.reasoningRaw.length > 0 && (
                 <div className="mb-6">
                   <h3 className="text-base font-semibold text-foreground mb-3">Что повлияло на оценку</h3>
-                  <div className="space-y-3">
-                    {selectedRisk.reasoningRaw.map((factor) => {
-                      const relatedMeasures = selectedRisk.measures?.filter(
-                        (m) => m.factorCode === factor.code
-                      ) ?? [];
-                      return (
-                        <div key={factor.code}>
-                          <FactorCard item={factor} />
-                          {relatedMeasures.length > 0 && (
-                            <div className="ml-4 mt-2 space-y-2">
-                              <div className="text-xs font-semibold text-muted-foreground">Меры снижения:</div>
-                              {relatedMeasures.map((measure) => (
-                                <FactorCard key={measure.code} item={measure} />
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
+                  <FactorsList
+                    factors={selectedRisk.reasoningRaw}
+                    measures={selectedRisk.measures ?? []}
+                  />
                 </div>
               )}
 
