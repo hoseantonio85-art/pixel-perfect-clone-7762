@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Sparkles, X, ChevronRight, Edit, QrCode, RotateCcw, AlertTriangle } from "lucide-react";
+import { ArrowLeft, Sparkles, X, ChevronRight, Edit, QrCode, RotateCcw, AlertTriangle, ShieldAlert, CheckCircle2, ChevronDown } from "lucide-react";
 import AppLayout from "@/components/AppLayout";
 import RiskBadge from "@/components/RiskBadge";
 import StatusBadge from "@/components/StatusBadge";
