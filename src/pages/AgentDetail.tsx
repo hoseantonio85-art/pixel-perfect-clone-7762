@@ -232,26 +232,29 @@ const AgentDetail = () => {
                 </div>
               )}
 
-              {/* Risk Factors */}
+              {/* Risk Factors with nested Measures */}
               {selectedRisk.reasoningRaw && selectedRisk.reasoningRaw.length > 0 && (
                 <div className="mb-6">
                   <h3 className="text-base font-semibold text-foreground mb-3">Что повлияло на оценку</h3>
                   <div className="space-y-3">
-                    {selectedRisk.reasoningRaw.map((factor) => (
-                      <FactorCard key={factor.code} item={factor} />
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Risk Measures */}
-              {selectedRisk.measures && selectedRisk.measures.length > 0 && (
-                <div className="mb-6">
-                  <h3 className="text-base font-semibold text-foreground mb-3">Что снижает риск</h3>
-                  <div className="space-y-3">
-                    {selectedRisk.measures.map((measure) => (
-                      <FactorCard key={measure.code} item={measure} />
-                    ))}
+                    {selectedRisk.reasoningRaw.map((factor) => {
+                      const relatedMeasures = selectedRisk.measures?.filter(
+                        (m) => m.factorCode === factor.code
+                      ) ?? [];
+                      return (
+                        <div key={factor.code}>
+                          <FactorCard item={factor} />
+                          {relatedMeasures.length > 0 && (
+                            <div className="ml-4 mt-2 space-y-2">
+                              <div className="text-xs font-semibold text-muted-foreground">Меры снижения:</div>
+                              {relatedMeasures.map((measure) => (
+                                <FactorCard key={measure.code} item={measure} />
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               )}
