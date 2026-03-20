@@ -389,30 +389,124 @@ const InfoRow = ({ label, value }: { label: string; value: string }) => (
   </div>
 );
 
-const FactorCard = ({ item }: { item: RiskFactor | RiskMeasure }) => (
-  <div className="bg-card rounded-lg border border-border p-4">
-    <div className="flex items-start justify-between gap-2 mb-1">
-      <div className="text-sm font-medium text-foreground">{item.title}</div>
-      {item.isDual && (
-        <span className="shrink-0 text-[10px] px-1.5 py-0.5 rounded bg-accent text-accent-foreground">
-          Требует контекста
-        </span>
-      )}
-    </div>
-    <div className="text-xs text-muted-foreground mb-3">
-      {item.code} · вес {item.weight.toFixed(1)}
-    </div>
-    {item.quotes.length > 0 && (
-      <div className="space-y-2">
-        {item.quotes.map((q, i) => (
-          <div key={i} className="border-l-2 border-primary/30 pl-3">
-            <div className="text-xs text-muted-foreground">{q.source}</div>
-            <div className="text-xs text-foreground italic">«{q.text}»</div>
+const FactorsList = ({ factors, measures }: { factors: RiskFactor[]; measures: RiskMeasure[] }) => {
+  const useAccordion = factors.length > 3;
+  const [openFactors, setOpenFactors] = useState<Record<string, boolean>>(
+    useAccordion ? {} : Object.fromEntries(factors.map((f) => [f.code, true]))
+  );
+
+  const toggle = (code: string) => {
+    setOpenFactors((prev) => ({ ...prev, [code]: !prev[code] }));
+  };
+
+  return (
+    <div className="space-y-3">
+      {factors.map((factor) => {
+        const relatedMeasures = measures.filter((m) => m.factorCode === factor.code);
+        const isOpen = !!openFactors[factor.code];
+
+        return (
+          <div key={factor.code} className="rounded-lg border border-border bg-card overflow-hidden">
+            <button
+              onClick={() => toggle(factor.code)}
+              className="w-full text-left p-4 flex items-start gap-3 hover:bg-muted/30 transition-colors"
+            >
+              <ShieldAlert className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
+              <div className="flex-1 min-w-0">
+                <div className="text-xs text-muted-foreground mb-0.5">
+                  {factor.code} · вес {factor.weight.toFixed(1)}
+                </div>
+                <div className="text-sm font-medium text-foreground">{factor.title}</div>
+                {!isOpen && (
+                  <div className="flex items-center gap-2 mt-1.5">
+                    {factor.isDual && (
+                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-accent text-accent-foreground">
+                        Требует контекста
+                      </span>
+                    )}
+                    {relatedMeasures.length > 0 ? (
+                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-primary/10 text-primary">
+                        Покрыт мерами
+                      </span>
+                    ) : (
+                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-destructive/10 text-destructive">
+                        Нет мер
+                      </span>
+                    )}
+                  </div>
+                )}
+              </div>
+              <ChevronDown className={`w-4 h-4 text-muted-foreground shrink-0 mt-0.5 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
+            </button>
+
+            {isOpen && (
+              <div className="px-4 pb-4">
+                <div className="flex items-center gap-2 mb-3 ml-7">
+                  {factor.isDual && (
+                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-accent text-accent-foreground">
+                      Требует контекста
+                    </span>
+                  )}
+                  {relatedMeasures.length > 0 ? (
+                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-primary/10 text-primary">
+                      Покрыт мерами
+                    </span>
+                  ) : (
+                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-destructive/10 text-destructive">
+                      Нет мер
+                    </span>
+                  )}
+                </div>
+
+                {factor.quotes.length > 0 && (
+                  <div className="space-y-2 ml-7 mb-3">
+                    {factor.quotes.map((q, i) => (
+                      <div key={i} className="border-l-2 border-primary/30 pl-3">
+                        <div className="text-xs text-muted-foreground">{q.source}</div>
+                        <div className="text-xs text-foreground italic">«{q.text}»</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {relatedMeasures.length > 0 && (
+                  <div className="ml-7 rounded-lg bg-muted/50 p-3 space-y-3">
+                    <div className="text-xs font-semibold text-muted-foreground">Меры снижения:</div>
+                    {relatedMeasures.map((measure) => (
+                      <div key={measure.code} className="flex items-start gap-2">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-muted-foreground mt-0.5 shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <div className="text-xs text-muted-foreground mb-0.5">
+                            {measure.code} · вес {measure.weight.toFixed(1)}
+                          </div>
+                          <div className="text-sm font-medium text-foreground">{measure.title}</div>
+                          {measure.isDual && (
+                            <span className="inline-block text-[10px] px-1.5 py-0.5 rounded bg-accent text-accent-foreground mt-1">
+                              Требует контекста
+                            </span>
+                          )}
+                          {measure.quotes.length > 0 && (
+                            <div className="space-y-1.5 mt-2">
+                              {measure.quotes.map((q, i) => (
+                                <div key={i} className="border-l-2 border-primary/30 pl-3">
+                                  <div className="text-xs text-muted-foreground">{q.source}</div>
+                                  <div className="text-xs text-foreground italic">«{q.text}»</div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
-        ))}
-      </div>
-    )}
-  </div>
-);
+        );
+      })}
+    </div>
+  );
+};
 
 export default AgentDetail;
