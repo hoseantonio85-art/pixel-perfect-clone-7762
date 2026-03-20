@@ -243,6 +243,7 @@ export const agents: Agent[] = [
             title: "Промежуточный слой фильтрации",
             weight: 1.5,
             isDual: false,
+            factorCode: "UFR-020",
             quotes: [
               { source: "Security.pdf", text: "Реализован базовый фильтр ключевых слов" },
             ],
