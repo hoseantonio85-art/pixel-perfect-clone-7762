@@ -51,6 +51,7 @@ export interface RiskMeasure {
   title: string;
   weight: number;
   isDual?: boolean;
+  factorCode: string;
   quotes: RiskQuote[];
 }
 

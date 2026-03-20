@@ -195,7 +195,7 @@ const AgentDetail = () => {
       {selectedRisk && (
         <div className="fixed inset-0 z-50 flex">
           <div className="flex-1 bg-foreground/20" onClick={() => setSelectedRisk(null)} />
-          <div className="w-[560px] bg-card shadow-2xl animate-slide-in-right overflow-y-auto">
+          <div className="w-[760px] bg-card shadow-2xl animate-slide-in-right overflow-y-auto">
             <div className="p-6">
               <button onClick={() => setSelectedRisk(null)} className="mb-4 text-muted-foreground hover:text-foreground">
                 <X className="w-5 h-5" />
