@@ -51,6 +51,7 @@ export interface RiskMeasure {
   title: string;
   weight: number;
   isDual?: boolean;
+  factorCode: string;
   quotes: RiskQuote[];
 }
 
@@ -145,6 +146,7 @@ export const agents: Agent[] = [
             title: "Наличие SLA с провайдером",
             weight: 2.0,
             isDual: false,
+            factorCode: "UFR-001",
             quotes: [
               { source: "BT.docx", text: "нет открытого ввода" },
             ],
@@ -154,6 +156,7 @@ export const agents: Agent[] = [
             title: "Резервный канал обработки запросов",
             weight: 1.5,
             isDual: true,
+            factorCode: "UFR-002",
             quotes: [
               { source: "Arch.pdf", text: "Предусмотрен ручной режим обработки" },
               { source: "BT.docx", text: "Описан процесс эскалации" },
@@ -197,6 +200,7 @@ export const agents: Agent[] = [
             title: "Namespace-изоляция в Kubernetes",
             weight: 1.8,
             isDual: false,
+            factorCode: "UFR-010",
             quotes: [
               { source: "Arch.pdf", text: "Каждый агент в отдельном namespace" },
             ],
@@ -239,6 +243,7 @@ export const agents: Agent[] = [
             title: "Промежуточный слой фильтрации",
             weight: 1.5,
             isDual: false,
+            factorCode: "UFR-020",
             quotes: [
               { source: "Security.pdf", text: "Реализован базовый фильтр ключевых слов" },
             ],
