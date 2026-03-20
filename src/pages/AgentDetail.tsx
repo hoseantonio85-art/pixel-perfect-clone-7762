@@ -406,26 +406,26 @@ const FactorsList = ({ factors, measures }: { factors: RiskFactor[]; measures: R
         const isOpen = !!openFactors[factor.code];
 
         return (
-          <div key={factor.code} className="rounded-lg border border-border bg-card overflow-hidden">
+          <div key={factor.code} className="rounded-lg border border-border bg-card overflow-hidden transition-colors hover:border-muted-foreground/30">
             <button
               onClick={() => toggle(factor.code)}
-              className="w-full text-left p-4 flex items-start gap-3 hover:bg-muted/30 transition-colors"
+              className="w-full text-left p-4 flex items-start gap-3"
             >
-              <ShieldAlert className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
+              <ShieldAlert className="w-4 h-4 text-muted-foreground/60 mt-0.5 shrink-0" />
               <div className="flex-1 min-w-0">
-                <div className="text-xs text-muted-foreground mb-0.5">
+                <div className="text-[11px] text-muted-foreground/70 mb-1">
                   {factor.code} · вес {factor.weight.toFixed(1)}
                 </div>
-                <div className="text-sm font-medium text-foreground">{factor.title}</div>
+                <div className="text-sm font-semibold text-foreground leading-snug">{factor.title}</div>
                 {!isOpen && (
-                  <div className="flex items-center gap-2 mt-1.5">
+                  <div className="flex items-center gap-2 mt-2">
                     {factor.isDual && (
-                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-accent text-accent-foreground">
+                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-accent text-accent-foreground font-medium">
                         Требует контекста
                       </span>
                     )}
                     {relatedMeasures.length > 0 ? (
-                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-primary/10 text-primary">
+                      <span className="text-[10px] px-1.5 py-0.5 rounded border border-border text-muted-foreground">
                         Покрыт мерами
                       </span>
                     ) : (
@@ -436,19 +436,20 @@ const FactorsList = ({ factors, measures }: { factors: RiskFactor[]; measures: R
                   </div>
                 )}
               </div>
-              <ChevronDown className={`w-4 h-4 text-muted-foreground shrink-0 mt-0.5 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
+              <ChevronDown className={`w-4 h-4 text-muted-foreground/50 shrink-0 mt-0.5 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
             </button>
 
             {isOpen && (
-              <div className="px-4 pb-4">
-                <div className="flex items-center gap-2 mb-3 ml-7">
+              <div className="px-4 pb-4 space-y-4">
+                {/* Tags */}
+                <div className="flex items-center gap-2 ml-7">
                   {factor.isDual && (
-                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-accent text-accent-foreground">
+                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-accent text-accent-foreground font-medium">
                       Требует контекста
                     </span>
                   )}
                   {relatedMeasures.length > 0 ? (
-                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-primary/10 text-primary">
+                    <span className="text-[10px] px-1.5 py-0.5 rounded border border-border text-muted-foreground">
                       Покрыт мерами
                     </span>
                   ) : (
@@ -458,39 +459,40 @@ const FactorsList = ({ factors, measures }: { factors: RiskFactor[]; measures: R
                   )}
                 </div>
 
+                {/* Quotes */}
                 {factor.quotes.length > 0 && (
-                  <div className="space-y-2 ml-7 mb-3">
+                  <div className="space-y-2.5 ml-7">
                     {factor.quotes.map((q, i) => (
-                      <div key={i} className="border-l-2 border-primary/30 pl-3">
-                        <div className="text-xs text-muted-foreground">{q.source}</div>
-                        <div className="text-xs text-foreground italic">«{q.text}»</div>
+                      <div key={i} className="border-l-2 border-primary/25 pl-3 py-0.5">
+                        <div className="text-[11px] text-muted-foreground/70 mb-0.5">{q.source}</div>
+                        <div className="text-xs text-foreground/80 italic leading-relaxed">«{q.text}»</div>
                       </div>
                     ))}
                   </div>
                 )}
 
+                {/* Nested Measures */}
                 {relatedMeasures.length > 0 && (
-                  <div className="ml-7 rounded-lg bg-muted/50 p-3 space-y-3">
-                    <div className="text-xs font-semibold text-muted-foreground">Меры снижения:</div>
+                  <div className="ml-7 border-l-2 border-border pl-4 py-3 space-y-4 bg-muted/25 rounded-r-lg">
                     {relatedMeasures.map((measure) => (
                       <div key={measure.code} className="flex items-start gap-2">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-muted-foreground mt-0.5 shrink-0" />
+                        <CheckCircle2 className="w-3.5 h-3.5 text-muted-foreground/50 mt-0.5 shrink-0" />
                         <div className="flex-1 min-w-0">
-                          <div className="text-xs text-muted-foreground mb-0.5">
+                          <div className="text-[11px] text-muted-foreground/70 mb-1">
                             {measure.code} · вес {measure.weight.toFixed(1)}
                           </div>
-                          <div className="text-sm font-medium text-foreground">{measure.title}</div>
+                          <div className="text-sm font-medium text-foreground leading-snug">{measure.title}</div>
                           {measure.isDual && (
-                            <span className="inline-block text-[10px] px-1.5 py-0.5 rounded bg-accent text-accent-foreground mt-1">
+                            <span className="inline-block text-[10px] px-1.5 py-0.5 rounded bg-accent text-accent-foreground font-medium mt-1.5">
                               Требует контекста
                             </span>
                           )}
                           {measure.quotes.length > 0 && (
-                            <div className="space-y-1.5 mt-2">
+                            <div className="space-y-2 mt-2.5">
                               {measure.quotes.map((q, i) => (
-                                <div key={i} className="border-l-2 border-primary/30 pl-3">
-                                  <div className="text-xs text-muted-foreground">{q.source}</div>
-                                  <div className="text-xs text-foreground italic">«{q.text}»</div>
+                                <div key={i} className="border-l-2 border-primary/25 pl-3 py-0.5">
+                                  <div className="text-[11px] text-muted-foreground/70 mb-0.5">{q.source}</div>
+                                  <div className="text-xs text-foreground/80 italic leading-relaxed">«{q.text}»</div>
                                 </div>
                               ))}
                             </div>
