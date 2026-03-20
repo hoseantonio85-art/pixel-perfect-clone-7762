@@ -146,6 +146,7 @@ export const agents: Agent[] = [
             title: "Наличие SLA с провайдером",
             weight: 2.0,
             isDual: false,
+            factorCode: "UFR-001",
             quotes: [
               { source: "BT.docx", text: "нет открытого ввода" },
             ],
