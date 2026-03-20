@@ -200,6 +200,7 @@ export const agents: Agent[] = [
             title: "Namespace-изоляция в Kubernetes",
             weight: 1.8,
             isDual: false,
+            factorCode: "UFR-010",
             quotes: [
               { source: "Arch.pdf", text: "Каждый агент в отдельном namespace" },
             ],
