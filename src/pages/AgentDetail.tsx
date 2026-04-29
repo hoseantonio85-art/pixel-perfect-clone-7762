@@ -748,12 +748,12 @@ const ActionFormModal = ({
   const [measureMode, setMeasureMode] = useState<"existing" | "new">("existing");
   const [measureValue, setMeasureValue] = useState("");
 
-  const titles: Record<typeof action, string> = {
+  const titles: Record<"dispute" | "edit" | "accept" | "measure", string> = {
     dispute: "Спор по риску",
     edit: "Правка риска",
     accept: "Принять риск",
     measure: "Мера",
-  } as const;
+  };
 
   const docRequired = action === "accept" && (riskLevel === "medium" || riskLevel === "high" || riskLevel === "critical");
 
