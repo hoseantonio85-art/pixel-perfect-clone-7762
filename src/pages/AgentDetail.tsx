@@ -868,7 +868,7 @@ const Field = ({ label, children }: { label: string; children: React.ReactNode }
   </label>
 );
 
-const FileField = ({ required }: { required?: boolean } = {}) => (
+const FileField = ({ required = false }: { required?: boolean }) => (
   <Field label={`Файл${required ? " (обязательно)" : ""}`}>
     <input type="file" className="block w-full text-xs text-muted-foreground file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-medium file:bg-muted file:text-foreground hover:file:bg-muted/70" />
   </Field>
