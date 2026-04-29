@@ -97,11 +97,12 @@ export const agents: Agent[] = [
     version: 1,
     lastModified: "24.12.2024",
     status: "awaiting",
+    cardStatus: "ready",
     info: {
       version: "1.2",
       versionStatus: "Разработка",
       evaluatedAt: "18.02.2026 · 14:32",
-      statusText: "Согласование",
+      statusText: "Готово",
       ke: "CI10112914",
       cra: "CRA-1000",
       lifecycle: "Страховка",
