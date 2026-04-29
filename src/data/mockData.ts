@@ -68,6 +68,9 @@ export interface RiskMeasure {
   quotes: RiskQuote[];
 }
 
+// Действие владельца по риску. Если null — риск считается согласованным по умолчанию.
+export type RiskOwnerAction = "dispute" | "edit" | "accept" | "measure" | "returned" | null;
+
 export interface Risk {
   id: string;
   code: string;
@@ -80,6 +83,8 @@ export interface Risk {
   finalRiskScore?: number;
   reasoningRaw?: RiskFactor[];
   measures?: RiskMeasure[];
+  ownerAction?: RiskOwnerAction;
+  ownerActionComment?: string;
 }
 
 export const agents: Agent[] = [
