@@ -5,6 +5,18 @@ export interface QGMIntegration {
   syncStatus: "Успешно" | "Ошибка";
 }
 
+// Короткий статус карточки агента (workflow)
+export type AgentCardStatus =
+  | "no_eval"        // Нет оценки
+  | "in_eval"        // В оценке
+  | "ready"          // Готово (AI оценил, владелец смотрит)
+  | "review"         // На разборе (владелец отметил риски)
+  | "approval"       // Согласование (УОР/КБ проверяют)
+  | "rework"         // Доработка (вернули)
+  | "approved"       // Согласовано
+  | "with_risks"     // С рисками
+  | "reeval";        // Переоценка
+
 export interface Agent {
   id: string;
   name: string;
@@ -15,6 +27,7 @@ export interface Agent {
   lastModified: string;
   status: "awaiting" | "approved" | "review" | "none";
   riskLevel?: "critical" | "high" | "medium" | "low";
+  cardStatus?: AgentCardStatus;
   info: {
     version: string;
     versionStatus: "Пром" | "Разработка";
@@ -55,6 +68,9 @@ export interface RiskMeasure {
   quotes: RiskQuote[];
 }
 
+// Действие владельца по риску. Если null — риск считается согласованным по умолчанию.
+export type RiskOwnerAction = "dispute" | "edit" | "accept" | "measure" | "returned" | null;
+
 export interface Risk {
   id: string;
   code: string;
@@ -67,6 +83,8 @@ export interface Risk {
   finalRiskScore?: number;
   reasoningRaw?: RiskFactor[];
   measures?: RiskMeasure[];
+  ownerAction?: RiskOwnerAction;
+  ownerActionComment?: string;
 }
 
 export const agents: Agent[] = [
@@ -79,11 +97,12 @@ export const agents: Agent[] = [
     version: 1,
     lastModified: "24.12.2024",
     status: "awaiting",
+    cardStatus: "ready",
     info: {
       version: "1.2",
       versionStatus: "Разработка",
       evaluatedAt: "18.02.2026 · 14:32",
-      statusText: "Согласование",
+      statusText: "Готово",
       ke: "CI10112914",
       cra: "CRA-1000",
       lifecycle: "Страховка",
@@ -106,6 +125,8 @@ export const agents: Agent[] = [
         title: "Отказ инфраструктуры ИИ - платформ и сервисов",
         level: "high",
         status: "Не применим",
+        ownerAction: "dispute",
+        ownerActionComment: "Не согласен с уровнем — резервирование уже внедрено",
         description: "Одностороннее изменение условий договора о выпуске и обслуживании банковской карты, договора оказания услуги «Уведомления по операциям», а также условий предоставления тарифных планов и пакетов услуг стороной, осуществляющей предпринимательскую деятельность.\n\nТакие действия могут быть расценены как нарушение прав потребителей и привести к снижению доверия клиентов к компании.",
         comment: "Здесь сотрудник сообщает почему оценка данного вида риска требует корректировки и имеет статус не применим",
         reasoning: "Анализ выявил высокую вероятность отказа инфраструктуры на основе зависимости от внешних сервисов и отсутствия резервирования. Меры снижения частично компенсируют риск.",
@@ -213,7 +234,7 @@ export const agents: Agent[] = [
         title: "Уязвимости конфигурации и цепочки поставок",
         level: "low",
         status: "",
-        description: "В августе 2022 в рамках сублицензионного договора осуществлена закупка лицензий ПО Kizen, но никаких файловых ...",
+        description: "Уязвимости в зависимостях и конфигурации компонентов.",
         comment: "",
       },
       {
@@ -222,33 +243,8 @@ export const agents: Agent[] = [
         title: "Прямые промпт-инъекции и манипуляции выводом модели",
         level: "high",
         status: "",
-        description: "В августе 2022 в рамках сублицензионного договора осуществлена закупка лицензий ПО Kizen, но никаких файловых ...",
+        description: "Возможность направленного воздействия на модель через промпт.",
         comment: "",
-        reasoning: "Выявлена высокая вероятность успешной промпт-инъекции через пользовательский ввод без надлежащей фильтрации.",
-        finalRiskScore: 14.1,
-        reasoningRaw: [
-          {
-            code: "UFR-020",
-            title: "Отсутствие входной валидации промптов",
-            weight: 2.0,
-            isDual: false,
-            quotes: [
-              { source: "BT.docx", text: "Пользовательский ввод передаётся напрямую в модель" },
-            ],
-          },
-        ],
-        measures: [
-          {
-            code: "UMF-120",
-            title: "Промежуточный слой фильтрации",
-            weight: 1.5,
-            isDual: false,
-            factorCode: "UFR-020",
-            quotes: [
-              { source: "Security.pdf", text: "Реализован базовый фильтр ключевых слов" },
-            ],
-          },
-        ],
       },
       {
         id: "r5",
@@ -256,17 +252,19 @@ export const agents: Agent[] = [
         title: "Не прямые промпт-инъекции (через данные и RAG)",
         level: "medium",
         status: "",
-        description: "В августе 2022 в рамках сублицензионного договора осуществлена закупка лицензий ПО Kizen, но никаких файловых ...",
+        description: "Инъекции через внешние документы и источники данных.",
         comment: "",
       },
       {
         id: "r6",
         code: "CRA-12328",
         title: "Утечка конфиденциальных данных через модель",
-        level: "critical",
+        level: "medium",
         status: "",
         description: "Возможность утечки данных через взаимодействие с языковой моделью.",
         comment: "",
+        ownerAction: "accept",
+        ownerActionComment: "Принимаем риск, документ согласован с КРГ",
       },
       {
         id: "r7",
@@ -290,7 +288,7 @@ export const agents: Agent[] = [
         id: "r9",
         code: "CRA-12331",
         title: "Нарушение регуляторных требований",
-        level: "high",
+        level: "medium",
         status: "",
         description: "Несоответствие требованиям регулятора в части использования ИИ.",
         comment: "",
@@ -308,7 +306,7 @@ export const agents: Agent[] = [
         id: "r11",
         code: "CRA-12333",
         title: "Несанкционированный доступ к модели",
-        level: "critical",
+        level: "low",
         status: "",
         description: "Возможность несанкционированного доступа.",
         comment: "",
@@ -326,9 +324,54 @@ export const agents: Agent[] = [
         id: "r13",
         code: "CRA-12335",
         title: "Репутационные риски",
-        level: "medium",
+        level: "low",
         status: "",
         description: "Риски для репутации компании при использовании ИИ.",
+        comment: "",
+      },
+      {
+        id: "r14",
+        code: "CRA-12336",
+        title: "Дрейф модели и деградация качества",
+        level: "low",
+        status: "",
+        description: "Снижение качества предсказаний модели со временем.",
+        comment: "",
+      },
+      {
+        id: "r15",
+        code: "CRA-12337",
+        title: "Зависимость от единственного провайдера LLM",
+        level: "low",
+        status: "",
+        description: "Vendor lock-in для базовой модели.",
+        comment: "",
+      },
+      {
+        id: "r16",
+        code: "CRA-12338",
+        title: "Недостаточная объяснимость решений",
+        level: "low",
+        status: "",
+        description: "Сложность интерпретации выводов модели.",
+        comment: "",
+      },
+      {
+        id: "r17",
+        code: "CRA-12339",
+        title: "Юридические риски использования контента",
+        level: "low",
+        status: "",
+        description: "Авторские права и лицензии на сгенерированный контент.",
+        comment: "",
+      },
+      {
+        id: "r18",
+        code: "CRA-12340",
+        title: "Риски этического характера",
+        level: "low",
+        status: "",
+        description: "Этические аспекты применения ИИ-агента.",
         comment: "",
       },
     ],
