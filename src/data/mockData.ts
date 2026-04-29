@@ -5,6 +5,18 @@ export interface QGMIntegration {
   syncStatus: "Успешно" | "Ошибка";
 }
 
+// Короткий статус карточки агента (workflow)
+export type AgentCardStatus =
+  | "no_eval"        // Нет оценки
+  | "in_eval"        // В оценке
+  | "ready"          // Готово (AI оценил, владелец смотрит)
+  | "review"         // На разборе (владелец отметил риски)
+  | "approval"       // Согласование (УОР/КБ проверяют)
+  | "rework"         // Доработка (вернули)
+  | "approved"       // Согласовано
+  | "with_risks"     // С рисками
+  | "reeval";        // Переоценка
+
 export interface Agent {
   id: string;
   name: string;
@@ -15,6 +27,7 @@ export interface Agent {
   lastModified: string;
   status: "awaiting" | "approved" | "review" | "none";
   riskLevel?: "critical" | "high" | "medium" | "low";
+  cardStatus?: AgentCardStatus;
   info: {
     version: string;
     versionStatus: "Пром" | "Разработка";
