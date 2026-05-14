@@ -262,8 +262,6 @@ export const agents: Agent[] = [
         status: "",
         description: "Возможность утечки данных через взаимодействие с языковой моделью.",
         comment: "",
-        ownerAction: "accept",
-        ownerActionComment: "Принимаем риск, документ согласован с КРГ",
       },
       {
         id: "r7",
