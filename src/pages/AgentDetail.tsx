@@ -12,7 +12,7 @@ import {
   ShieldAlert,
   CheckCircle2,
   ChevronDown,
-  Check,
+  ArrowLeftRight,
 } from "lucide-react";
 import AppLayout from "@/components/AppLayout";
 import RiskBadge from "@/components/RiskBadge";
@@ -23,66 +23,32 @@ import {
   type Risk,
   type RiskFactor,
   type RiskMeasure,
-  type RiskOwnerAction,
   type AgentCardStatus,
 } from "@/data/mockData";
 
-// --- Локальные конфиги статусов и действий ---
-
-const ownerActionLabels: Record<Exclude<RiskOwnerAction, null | undefined>, string> = {
-  dispute: "Спор",
-  edit: "Правка",
-  accept: "Принят",
-  measure: "Меры",
-  returned: "Возврат",
-};
-
-const ownerActionStyles: Record<Exclude<RiskOwnerAction, null | undefined>, string> = {
-  dispute: "bg-destructive/10 text-destructive border-destructive/20",
-  edit: "bg-accent text-accent-foreground border-accent",
-  accept: "bg-muted text-foreground border-border",
-  measure: "bg-primary/10 text-primary border-primary/20",
-  returned: "bg-destructive/10 text-destructive border-destructive/20",
-};
+// --- Локальные конфиги статусов ---
 
 const cardStatusShort: Record<AgentCardStatus, string> = {
   no_eval: "Нет оценки",
   in_eval: "В оценке",
   ready: "Готово",
-  review: "На разборе",
+  dispute: "Есть спор",
+  arbitration: "Арбитраж",
   approval: "Согласование",
-  rework: "Доработка",
   approved: "Согласовано",
-  with_risks: "С рисками",
-  reeval: "Переоценка",
+  corrected: "Скорректировано",
 };
 
 const cardStatusHint: Record<AgentCardStatus, string> = {
   no_eval: "Оценка ещё не запускалась",
   in_eval: "AI оценивает риски",
-  ready: "Оценка завершена, можно отправить на согласование",
-  review: "Есть отмеченные риски — проверьте перед отправкой",
-  approval: "Ожидается проверка УОР и Кибербезопасности",
-  rework: "Согласующие вернули риски на доработку",
+  ready: "Оценка завершена, можно отправить",
+  dispute: "Есть оспоренные риски — будет отправлено на арбитраж",
+  arbitration: "Спорные риски рассматриваются в отдельном канале",
+  approval: "Карточка отправлена на согласование",
   approved: "Карточка согласована",
-  with_risks: "Согласовано с принятыми рисками",
-  reeval: "Требуется переоценка",
+  corrected: "Оценка скорректирована после арбитража",
 };
-
-// Соответствие статуса карточки и активного шага в stepper
-const cardStatusToStep: Record<AgentCardStatus, number> = {
-  no_eval: 0,
-  in_eval: 0,
-  ready: 0,
-  review: 1,
-  approval: 2,
-  rework: 1,
-  approved: 3,
-  with_risks: 3,
-  reeval: 0,
-};
-
-const STEPS = ["Готово", "Разбор", "Согласование", "Фиксация"];
 
 // --- Компонент ---
 
