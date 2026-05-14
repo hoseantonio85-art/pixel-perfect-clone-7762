@@ -354,12 +354,8 @@ const AgentDetail = () => {
                 <div className="flex gap-2">
                   <button
                     onClick={handleMainAction}
-                    title={mainAction.tooltip}
-                    className={`flex-1 h-10 rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-opacity hover:opacity-90 ${
-                      mainAction.primary
-                        ? "bg-primary text-primary-foreground"
-                        : "border border-border text-foreground bg-card"
-                    }`}
+                    disabled={mainAction.disabled}
+                    className="flex-1 h-10 rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-opacity hover:opacity-90 bg-primary text-primary-foreground disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {mainAction.label === "Оценить" && <Sparkles className="w-4 h-4" />}
                     {mainAction.label}
