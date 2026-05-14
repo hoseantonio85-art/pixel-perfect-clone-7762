@@ -68,7 +68,7 @@ export interface RiskMeasure {
 }
 
 // Действие владельца по риску. Если null — риск считается согласованным по умолчанию.
-export type RiskOwnerAction = "dispute" | "edit" | "accept" | "measure" | "returned" | null;
+export type RiskOwnerAction = "dispute" | "returned" | null;
 
 export interface Risk {
   id: string;
