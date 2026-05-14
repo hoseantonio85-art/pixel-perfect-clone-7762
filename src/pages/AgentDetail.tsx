@@ -63,103 +63,122 @@ const AgentDetail = () => {
   );
   const [risks, setRisks] = useState<Risk[]>(baseAgent?.risks ?? []);
 
+  const disputeCount = useMemo(
+    () => risks.filter((r) => r.ownerAction === "dispute").length,
+    [risks]
+  );
+
+  // Базовый статус (зависит от пользовательских отправок). Производный для UI учитывает споры.
+  const [baseStatus, setBaseStatus] = useState<AgentCardStatus>(
+    baseAgent?.cardStatus ?? "no_eval"
+  );
+  const cardStatus: AgentCardStatus = useMemo(() => {
+    // После отправки — фиксированный статус
+    if (
+      baseStatus === "arbitration" ||
+      baseStatus === "approval" ||
+      baseStatus === "approved" ||
+      baseStatus === "corrected"
+    ) {
+      return baseStatus;
+    }
+    if (baseStatus === "no_eval" || baseStatus === "in_eval") return baseStatus;
+    return disputeCount > 0 ? "dispute" : "ready";
+  }, [baseStatus, disputeCount]);
+
   const [showBanner, setShowBanner] = useState(true);
   const [selectedRiskId, setSelectedRiskId] = useState<string | null>(null);
   const [showVersionHistory, setShowVersionHistory] = useState(false);
   const [showVersionDetail, setShowVersionDetail] = useState(false);
   const [showSendModal, setShowSendModal] = useState(false);
-
-  // Активная форма действия по риску
-  const [activeAction, setActiveAction] = useState<null | "dispute" | "edit" | "accept" | "measure">(null);
+  const [showDisputeForm, setShowDisputeForm] = useState(false);
 
   if (!baseAgent) return null;
   const agent = baseAgent;
 
   const selectedRisk = risks.find((r) => r.id === selectedRiskId) ?? null;
 
-  // Подсчёт отмеченных владельцем рисков
-  const markedRisks = useMemo(
-    () => risks.filter((r) => r.ownerAction && r.ownerAction !== "returned"),
-    [risks]
-  );
-  const disputeCount = markedRisks.filter((r) => r.ownerAction === "dispute").length;
-  const editCount = markedRisks.filter((r) => r.ownerAction === "edit").length;
-  const acceptCount = markedRisks.filter((r) => r.ownerAction === "accept").length;
-  const measureCount = markedRisks.filter((r) => r.ownerAction === "measure").length;
+  const isSent =
+    cardStatus === "arbitration" ||
+    cardStatus === "approval" ||
+    cardStatus === "approved" ||
+    cardStatus === "corrected";
 
-  const returnedCount = risks.filter((r) => r.ownerAction === "returned").length;
-
-  // Главная кнопка зависит от состояния
+  // Главная кнопка
   const mainAction = useMemo(() => {
-    switch (cardStatus) {
-      case "no_eval":
-      case "in_eval":
-      case "reeval":
-        return { label: "Оценить", tooltip: "Запустить AI-оценку 18 рисков", primary: true };
-      case "ready":
-      case "review":
-        return { label: "Отправить", tooltip: "Отправить карточку и 18 рисков на согласование", primary: true };
-      case "rework":
-        return { label: "Повторно", tooltip: "Отправить карточку повторно после доработки", primary: true };
-      case "approved":
-      case "with_risks":
-        return { label: "Архив", tooltip: "Карточка согласована, перенести в архив", primary: false };
-      case "approval":
-        return { label: "Разобрать", tooltip: "Открыть карточку для разбора", primary: true };
-      default:
-        return { label: "Отправить", tooltip: "", primary: true };
+    if (cardStatus === "no_eval" || cardStatus === "in_eval") {
+      return { label: "Оценить", disabled: false };
     }
-  }, [cardStatus]);
+    if (isSent) {
+      return { label: "Отправлено", disabled: true };
+    }
+    return {
+      label: disputeCount > 0 ? "Арбитраж" : "Отправить",
+      disabled: false,
+    };
+  }, [cardStatus, disputeCount, isSent]);
 
   const handleMainAction = () => {
-    if (mainAction.label === "Отправить" || mainAction.label === "Повторно") {
-      setShowSendModal(true);
-    } else if (mainAction.label === "Оценить") {
-      setCardStatus("ready");
+    if (mainAction.disabled) return;
+    if (mainAction.label === "Оценить") {
+      setBaseStatus("ready");
+      return;
     }
+    setShowSendModal(true);
   };
 
   const confirmSend = () => {
-    setCardStatus("approval");
+    setBaseStatus(disputeCount > 0 ? "arbitration" : "approval");
     setShowSendModal(false);
   };
 
-  const setRiskAction = (
-    riskId: string,
-    action: Exclude<RiskOwnerAction, null | undefined>,
-    comment?: string
-  ) => {
+  const saveDispute = (comment: string) => {
+    if (!selectedRisk) return;
     setRisks((prev) =>
       prev.map((r) =>
-        r.id === riskId ? { ...r, ownerAction: action, ownerActionComment: comment ?? r.ownerActionComment } : r
+        r.id === selectedRisk.id
+          ? { ...r, ownerAction: "dispute", ownerActionComment: comment }
+          : r
       )
     );
-    if (cardStatus === "ready") setCardStatus("review");
+    setShowDisputeForm(false);
   };
 
-  // Динамический helper-текст под stepper
-  const helperText = (() => {
+  // Информационный блок над списком рисков
+  const infoBlock = (() => {
+    if (cardStatus === "arbitration") {
+      return {
+        title: "На арбитраже",
+        text:
+          "Спорные риски будут рассмотрены в отдельном канале. После решения оценка будет согласована или скорректирована.",
+      };
+    }
     if (cardStatus === "approval") {
-      return "Оценка отправлена. УОР и Кибербезопасность проверяют результаты.";
+      return {
+        title: "Отправлено на согласование",
+        text: "Карточка передана согласующим. Спорных рисков нет.",
+      };
     }
-    if (cardStatus === "rework") {
-      return `Кибербезопасность вернула ${returnedCount || 2} риска. Исправьте замечания и отправьте карточку повторно.`;
+    if (cardStatus === "approved") {
+      return { title: "Согласовано", text: "Карточка согласована." };
     }
-    if (markedRisks.length > 0) {
-      const parts: string[] = [];
-      if (disputeCount) parts.push(`${disputeCount} спор`);
-      if (editCount) parts.push(`${editCount} правка`);
-      if (acceptCount) parts.push(`${acceptCount} принятие риска`);
-      if (measureCount) parts.push(`${measureCount} мера`);
-      return `Перед отправкой проверьте ${markedRisks.length} отмеченных риска: ${parts.join(", ")}.`;
+    if (cardStatus === "corrected") {
+      return {
+        title: "Скорректировано",
+        text: "Оценка обновлена по результатам арбитража.",
+      };
     }
-    if (cardStatus === "ready" || cardStatus === "review") {
-      return "Можно отправить карточку на согласование. Если не согласны с отдельными рисками — отметьте их перед отправкой.";
+    if (disputeCount > 0) {
+      return {
+        title: "Есть спор",
+        text: `Вы оспорили ${disputeCount} ${disputeCount === 1 ? "риск" : "рисков"}. Карточка будет отправлена на арбитраж.`,
+      };
     }
-    return cardStatusHint[cardStatus];
+    return {
+      title: "Оценка готова",
+      text: "AI оценил 18 рисков версии. Если результат вас устраивает, отправьте карточку дальше.",
+    };
   })();
-
-  const activeStep = cardStatusToStep[cardStatus];
 
   const riskCategories = ["УМР", "УОР", "ДТН", "ДКБ"];
 
