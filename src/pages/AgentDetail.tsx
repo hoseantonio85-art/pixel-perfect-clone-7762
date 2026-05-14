@@ -57,10 +57,6 @@ const AgentDetail = () => {
   const navigate = useNavigate();
   const baseAgent = agents.find((a) => a.id === id);
 
-  // Локальное состояние для прототипа: статус карточки и действия по рискам
-  const [cardStatus, setCardStatus] = useState<AgentCardStatus>(
-    baseAgent?.cardStatus ?? "no_eval"
-  );
   const [risks, setRisks] = useState<Risk[]>(baseAgent?.risks ?? []);
 
   const disputeCount = useMemo(
