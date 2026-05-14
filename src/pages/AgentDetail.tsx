@@ -545,49 +545,6 @@ const AgentDetail = () => {
         </div>
       )}
 
-      {/* Send confirmation modal */}
-      {showSendModal && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-foreground/40 p-4">
-          <div className="bg-card rounded-2xl shadow-2xl w-full max-w-md p-6 animate-in fade-in zoom-in-95 duration-150">
-            <h3 className="text-lg font-bold text-foreground mb-3">Отправить оценку?</h3>
-            {markedRisks.length === 0 ? (
-              <p className="text-sm text-muted-foreground mb-4">
-                Будет отправлена карточка агента и {risks.length} рисков. Спорных рисков нет.
-              </p>
-            ) : (
-              <div className="text-sm text-muted-foreground mb-4">
-                <div>Будет отправлена карточка агента и {risks.length} рисков.</div>
-                <div className="mt-2 text-foreground font-medium">Отмечено владельцем:</div>
-                <ul className="mt-1 space-y-0.5">
-                  {disputeCount > 0 && <li>— {disputeCount} спор</li>}
-                  {editCount > 0 && <li>— {editCount} правка</li>}
-                  {acceptCount > 0 && <li>— {acceptCount} принятие риска</li>}
-                  {measureCount > 0 && <li>— {measureCount} мера</li>}
-                </ul>
-              </div>
-            )}
-            <div className="text-sm text-foreground mb-5">
-              <div className="font-medium mb-1">Согласующие:</div>
-              <div className="text-muted-foreground">— УОР</div>
-              <div className="text-muted-foreground">— Кибербезопасность</div>
-            </div>
-            <div className="flex justify-end gap-2">
-              <button
-                onClick={() => setShowSendModal(false)}
-                className="h-10 px-4 rounded-lg border border-border text-sm text-foreground hover:bg-muted transition-colors"
-              >
-                Отмена
-              </button>
-              <button
-                onClick={confirmSend}
-                className="h-10 px-4 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-opacity"
-              >
-                Отправить
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Version Detail Panel */}
       {showVersionDetail && (
