@@ -284,15 +284,13 @@ const AgentDetail = () => {
                       </div>
                     </div>
                     <div className="flex items-center gap-2 ml-4 shrink-0">
-                      {risk.ownerAction && (
-                        <span
-                          className={`text-[11px] px-2 py-0.5 rounded-full border font-medium ${ownerActionStyles[risk.ownerAction]}`}
-                        >
-                          {ownerActionLabels[risk.ownerAction]}
+                      <RiskBadge level={risk.level} />
+                      {risk.ownerAction === "dispute" && (
+                        <span className="text-[11px] px-2 py-0.5 rounded-full border font-medium bg-destructive/10 text-destructive border-destructive/20 inline-flex items-center gap-1">
+                          <ArrowLeftRight className="w-3 h-3" /> Спор
                         </span>
                       )}
                       <Sparkles className="w-4 h-4 text-primary" />
-                      <RiskBadge level={risk.level} />
                     </div>
                   </div>
                 </div>
