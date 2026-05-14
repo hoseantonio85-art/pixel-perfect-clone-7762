@@ -225,19 +225,6 @@ const AgentDetail = () => {
               </div>
             )}
 
-            {/* Doработка alert */}
-            {cardStatus === "rework" && (
-              <div className="bg-card border border-border rounded-xl p-4 mb-6">
-                <div className="text-sm font-semibold text-foreground mb-1">Есть замечания</div>
-                <div className="text-sm text-muted-foreground mb-3">
-                  Кибербезопасность вернула 2 риска. УОР подтвердило оценку без замечаний.
-                </div>
-                <ul className="text-sm text-foreground space-y-1 mb-3 list-disc pl-5">
-                  <li>CRA-12323: уточнить применимость риска</li>
-                  <li>CRA-12324: приложить документ</li>
-                </ul>
-              </div>
-            )}
 
             {/* Risk levels card */}
             <div className="bg-card rounded-xl border border-border p-5 mb-6">
