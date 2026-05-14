@@ -669,140 +669,46 @@ const InfoRow = ({ label, value }: { label: string; value: string }) => (
   </div>
 );
 
-const ActionButton = ({ label, onClick }: { label: string; onClick: () => void }) => (
-  <button
-    onClick={onClick}
-    className="h-9 px-3 rounded-lg border border-border bg-card text-sm font-medium text-foreground hover:bg-muted transition-colors"
-  >
-    {label}
-  </button>
-);
+// --- Форма «Оспорить» ---
 
-// --- Формы действий ---
-
-const ActionFormModal = ({
-  action,
-  riskLevel,
+const DisputeFormModal = ({
+  initialComment,
   onCancel,
   onSave,
 }: {
-  action: "dispute" | "edit" | "accept" | "measure";
-  riskLevel: Risk["level"];
+  initialComment: string;
   onCancel: () => void;
-  onSave: (comment?: string) => void;
+  onSave: (comment: string) => void;
 }) => {
-  const [comment, setComment] = useState("");
-  const [reason, setReason] = useState("");
-  const [editField, setEditField] = useState("уровень");
-  const [acceptDeadline, setAcceptDeadline] = useState("");
-  const [acceptApprover, setAcceptApprover] = useState("КРГ");
-  const [measureMode, setMeasureMode] = useState<"existing" | "new">("existing");
-  const [measureValue, setMeasureValue] = useState("");
-
-  const titles: Record<"dispute" | "edit" | "accept" | "measure", string> = {
-    dispute: "Спор по риску",
-    edit: "Правка риска",
-    accept: "Принять риск",
-    measure: "Мера",
-  };
-
-  const docRequired = action === "accept" && (riskLevel === "medium" || riskLevel === "high" || riskLevel === "critical");
+  const [comment, setComment] = useState(initialComment);
 
   return (
     <div className="fixed inset-0 z-[70] flex items-center justify-center bg-foreground/40 p-4">
       <div className="bg-card rounded-2xl shadow-2xl w-full max-w-md p-6 animate-in fade-in zoom-in-95 duration-150">
-        <h3 className="text-lg font-bold text-foreground mb-4">{titles[action]}</h3>
-
-        {action === "dispute" && (
-          <div className="space-y-3 mb-5">
-            <Field label="Причина спора">
-              <input value={reason} onChange={(e) => setReason(e.target.value)} className="form-input" placeholder="Например: уровень завышен" />
-            </Field>
-            <Field label="Комментарий">
-              <textarea value={comment} onChange={(e) => setComment(e.target.value)} className="form-input min-h-[80px]" />
-            </Field>
-            <FileField />
-          </div>
-        )}
-
-        {action === "edit" && (
-          <div className="space-y-3 mb-5">
-            <Field label="Что изменить">
-              <select value={editField} onChange={(e) => setEditField(e.target.value)} className="form-input">
-                <option value="уровень">Уровень</option>
-                <option value="вероятность">Вероятность</option>
-                <option value="влияние">Влияние</option>
-                <option value="формулировку">Формулировку</option>
-                <option value="применимость">Применимость</option>
-              </select>
-            </Field>
-            <Field label="Комментарий">
-              <textarea value={comment} onChange={(e) => setComment(e.target.value)} className="form-input min-h-[80px]" />
-            </Field>
-            <FileField />
-          </div>
-        )}
-
-        {action === "accept" && (
-          <div className="space-y-3 mb-5">
-            <p className="text-sm text-muted-foreground">
-              Вы фиксируете решение продолжить использование агента с этим риском без дополнительных мер снижения.
-            </p>
-            <Field label="Причина">
-              <input value={reason} onChange={(e) => setReason(e.target.value)} className="form-input" />
-            </Field>
-            <Field label="Срок действия">
-              <input type="date" value={acceptDeadline} onChange={(e) => setAcceptDeadline(e.target.value)} className="form-input" />
-            </Field>
-            <Field label="Согласующий">
-              <select value={acceptApprover} onChange={(e) => setAcceptApprover(e.target.value)} className="form-input">
-                <option value="КРГ">КРГ</option>
-                <option value="Руководитель блока">Руководитель блока</option>
-              </select>
-            </Field>
-            <FileField required={docRequired} />
-            {docRequired && (
-              <div className="text-xs text-muted-foreground">Документ обязателен для среднего и высокого риска.</div>
-            )}
-          </div>
-        )}
-
-        {action === "measure" && (
-          <div className="space-y-3 mb-5">
-            <div className="flex gap-2">
-              <button
-                onClick={() => setMeasureMode("existing")}
-                className={`flex-1 h-9 rounded-lg text-sm border transition-colors ${
-                  measureMode === "existing" ? "bg-primary text-primary-foreground border-primary" : "border-border text-foreground"
-                }`}
-              >
-                Выбрать существующую
-              </button>
-              <button
-                onClick={() => setMeasureMode("new")}
-                className={`flex-1 h-9 rounded-lg text-sm border transition-colors ${
-                  measureMode === "new" ? "bg-primary text-primary-foreground border-primary" : "border-border text-foreground"
-                }`}
-              >
-                Создать новую
-              </button>
-            </div>
-            <Field label={measureMode === "existing" ? "Существующая мера" : "Название новой меры"}>
-              <input value={measureValue} onChange={(e) => setMeasureValue(e.target.value)} className="form-input" />
-            </Field>
-            <Field label="Комментарий">
-              <textarea value={comment} onChange={(e) => setComment(e.target.value)} className="form-input min-h-[80px]" />
-            </Field>
-          </div>
-        )}
-
+        <h3 className="text-lg font-bold text-foreground mb-2">Комментарий к риску</h3>
+        <p className="text-sm text-muted-foreground mb-4">
+          Опишите, с чем не согласны. Комментарий уйдёт на арбитраж вместе с карточкой.
+        </p>
+        <label className="block mb-5">
+          <div className="text-xs font-medium text-muted-foreground mb-1">Комментарий</div>
+          <textarea
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+            className="form-input min-h-[110px]"
+            placeholder="Например: уровень завышен, есть компенсирующая мера…"
+          />
+        </label>
         <div className="flex justify-end gap-2">
-          <button onClick={onCancel} className="h-10 px-4 rounded-lg border border-border text-sm text-foreground hover:bg-muted transition-colors">
+          <button
+            onClick={onCancel}
+            className="h-10 px-4 rounded-lg border border-border text-sm text-foreground hover:bg-muted transition-colors"
+          >
             Отмена
           </button>
           <button
-            onClick={() => onSave(comment || reason || measureValue)}
-            className="h-10 px-4 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-opacity"
+            onClick={() => onSave(comment.trim())}
+            disabled={!comment.trim()}
+            className="h-10 px-4 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Сохранить
           </button>
@@ -811,19 +717,6 @@ const ActionFormModal = ({
     </div>
   );
 };
-
-const Field = ({ label, children }: { label: string; children: React.ReactNode }) => (
-  <label className="block">
-    <div className="text-xs font-medium text-muted-foreground mb-1">{label}</div>
-    {children}
-  </label>
-);
-
-const FileField = ({ required = false }: { required?: boolean }) => (
-  <Field label={`Файл${required ? " (обязательно)" : ""}`}>
-    <input type="file" className="block w-full text-xs text-muted-foreground file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-medium file:bg-muted file:text-foreground hover:file:bg-muted/70" />
-  </Field>
-);
 
 const FactorsList = ({ factors, measures }: { factors: RiskFactor[]; measures: RiskMeasure[] }) => {
   const useAccordion = factors.length > 3;
