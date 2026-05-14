@@ -10,12 +10,11 @@ export type AgentCardStatus =
   | "no_eval"        // Нет оценки
   | "in_eval"        // В оценке
   | "ready"          // Готово (AI оценил, владелец смотрит)
-  | "review"         // На разборе (владелец отметил риски)
-  | "approval"       // Согласование (УОР/КБ проверяют)
-  | "rework"         // Доработка (вернули)
+  | "dispute"        // Есть спор (владелец оспорил риск)
+  | "arbitration"    // Арбитраж (отправлено на арбитраж)
+  | "approval"       // Согласование (отправлено без споров)
   | "approved"       // Согласовано
-  | "with_risks"     // С рисками
-  | "reeval";        // Переоценка
+  | "corrected";     // Скорректировано
 
 export interface Agent {
   id: string;
@@ -69,7 +68,7 @@ export interface RiskMeasure {
 }
 
 // Действие владельца по риску. Если null — риск считается согласованным по умолчанию.
-export type RiskOwnerAction = "dispute" | "edit" | "accept" | "measure" | "returned" | null;
+export type RiskOwnerAction = "dispute" | "returned" | null;
 
 export interface Risk {
   id: string;
@@ -263,8 +262,6 @@ export const agents: Agent[] = [
         status: "",
         description: "Возможность утечки данных через взаимодействие с языковой моделью.",
         comment: "",
-        ownerAction: "accept",
-        ownerActionComment: "Принимаем риск, документ согласован с КРГ",
       },
       {
         id: "r7",
