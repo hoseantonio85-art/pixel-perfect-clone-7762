@@ -376,47 +376,63 @@ const AgentDetail = () => {
       {/* Risk Detail Slide Panel */}
       {selectedRisk && (
         <div className="fixed inset-0 z-50 flex">
-          <div className="flex-1 bg-foreground/20" onClick={() => { setSelectedRiskId(null); setActiveAction(null); }} />
+          <div
+            className="flex-1 bg-foreground/20"
+            onClick={() => {
+              setSelectedRiskId(null);
+              setShowDisputeForm(false);
+            }}
+          />
           <div className="w-[760px] bg-card shadow-2xl animate-slide-in-right overflow-y-auto">
             <div className="p-6">
-              <button onClick={() => { setSelectedRiskId(null); setActiveAction(null); }} className="mb-4 text-muted-foreground hover:text-foreground">
+              <button
+                onClick={() => {
+                  setSelectedRiskId(null);
+                  setShowDisputeForm(false);
+                }}
+                className="mb-4 text-muted-foreground hover:text-foreground"
+              >
                 <X className="w-5 h-5" />
               </button>
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-xs text-muted-foreground">{selectedRisk.code}</span>
-                {selectedRisk.ownerAction && (
-                  <span
-                    className={`text-[11px] px-2 py-0.5 rounded-full border font-medium ${ownerActionStyles[selectedRisk.ownerAction]}`}
-                  >
-                    {ownerActionLabels[selectedRisk.ownerAction]}
-                  </span>
-                )}
               </div>
               <h2 className="text-xl font-bold text-foreground mb-4">{selectedRisk.title}</h2>
 
-              <div className="mb-4">
-                <div className="text-xs text-muted-foreground mb-1">Уровень риска</div>
-                <div className="flex items-center gap-2">
-                  <RiskBadge level={selectedRisk.level} size="md" />
-                  {selectedRisk.status && (
-                    <span className="text-sm text-muted-foreground">{selectedRisk.status}</span>
+              {/* Виджет «Уровень риска» с действием Оспорить */}
+              <div className="mb-6 border border-border rounded-xl p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <div className="text-xs text-muted-foreground mb-2">Уровень риска</div>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <RiskBadge level={selectedRisk.level} size="md" />
+                      {selectedRisk.ownerAction === "dispute" && (
+                        <span className="text-[11px] px-2 py-0.5 rounded-full border font-medium bg-destructive/10 text-destructive border-destructive/20 inline-flex items-center gap-1">
+                          <ArrowLeftRight className="w-3 h-3" /> Спор
+                        </span>
+                      )}
+                    </div>
+                    <div className="text-xs text-muted-foreground mt-2">
+                      AI оценил риск на основе факторов и мер.
+                    </div>
+                  </div>
+                  {!isSent && (
+                    <button
+                      onClick={() => setShowDisputeForm(true)}
+                      className="text-sm text-foreground hover:text-primary inline-flex items-center gap-1 shrink-0"
+                    >
+                      <ArrowLeftRight className="w-4 h-4" />
+                      {selectedRisk.ownerAction === "dispute" ? "Изменить" : "Оспорить"}
+                    </button>
                   )}
                 </div>
-              </div>
 
-              {/* Действия владельца */}
-              <div className="mb-6 bg-muted/40 rounded-lg p-4">
-                <div className="text-xs font-medium text-muted-foreground mb-2">Действия владельца</div>
-                <div className="flex flex-wrap gap-2">
-                  <ActionButton label="Спор" onClick={() => setActiveAction("dispute")} />
-                  <ActionButton label="Правка" onClick={() => setActiveAction("edit")} />
-                  <ActionButton label="Принять" onClick={() => setActiveAction("accept")} />
-                  <ActionButton label="Мера" onClick={() => setActiveAction("measure")} />
-                </div>
-                {selectedRisk.ownerActionComment && (
-                  <div className="mt-3 text-xs text-muted-foreground">
-                    <span className="font-medium text-foreground">Комментарий: </span>
-                    {selectedRisk.ownerActionComment}
+                {selectedRisk.ownerAction === "dispute" && selectedRisk.ownerActionComment && (
+                  <div className="mt-3 pt-3 border-t border-border text-xs">
+                    <div className="font-medium text-foreground mb-1">Комментарий владельца</div>
+                    <div className="text-muted-foreground leading-relaxed">
+                      {selectedRisk.ownerActionComment}
+                    </div>
                   </div>
                 )}
               </div>
@@ -472,18 +488,60 @@ const AgentDetail = () => {
             </div>
           </div>
 
-          {/* Inline action form modal (внутри дровера) */}
-          {activeAction && (
-            <ActionFormModal
-              action={activeAction}
-              riskLevel={selectedRisk.level}
-              onCancel={() => setActiveAction(null)}
-              onSave={(comment) => {
-                setRiskAction(selectedRisk.id, activeAction, comment);
-                setActiveAction(null);
-              }}
+          {showDisputeForm && (
+            <DisputeFormModal
+              initialComment={selectedRisk.ownerActionComment ?? ""}
+              onCancel={() => setShowDisputeForm(false)}
+              onSave={saveDispute}
             />
           )}
+        </div>
+      )}
+
+      {/* Send confirmation modal */}
+      {showSendModal && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-foreground/40 p-4">
+          <div className="bg-card rounded-2xl shadow-2xl w-full max-w-md p-6 animate-in fade-in zoom-in-95 duration-150">
+            {disputeCount === 0 ? (
+              <>
+                <h3 className="text-lg font-bold text-foreground mb-3">Отправить оценку?</h3>
+                <p className="text-sm text-muted-foreground mb-5">
+                  Будет отправлена карточка агента и {risks.length} рисков. Спорных рисков нет.
+                </p>
+              </>
+            ) : (
+              <>
+                <h3 className="text-lg font-bold text-foreground mb-3">Отправить на арбитраж?</h3>
+                <p className="text-sm text-muted-foreground mb-3">
+                  Будет отправлена карточка агента и {risks.length} рисков. На арбитраж уйдут спорные риски: {disputeCount}.
+                </p>
+                <div className="bg-muted rounded-lg p-3 mb-5 space-y-1.5">
+                  {risks
+                    .filter((r) => r.ownerAction === "dispute")
+                    .map((r) => (
+                      <div key={r.id} className="text-xs">
+                        <span className="text-muted-foreground">{r.code}</span>{" "}
+                        <span className="text-foreground">{r.title}</span>
+                      </div>
+                    ))}
+                </div>
+              </>
+            )}
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => setShowSendModal(false)}
+                className="h-10 px-4 rounded-lg border border-border text-sm text-foreground hover:bg-muted transition-colors"
+              >
+                Отмена
+              </button>
+              <button
+                onClick={confirmSend}
+                className="h-10 px-4 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-opacity"
+              >
+                Отправить
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
