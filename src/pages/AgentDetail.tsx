@@ -251,36 +251,10 @@ const AgentDetail = () => {
               </div>
             </div>
 
-            {/* Workflow stepper */}
+            {/* Информационный блок */}
             <div className="bg-card rounded-xl border border-border p-4 mb-6">
-              <div className="flex items-center gap-2">
-                {STEPS.map((s, i) => {
-                  const isActive = i === activeStep;
-                  const isDone = i < activeStep;
-                  return (
-                    <div key={s} className="flex items-center gap-2 flex-1 min-w-0">
-                      <div
-                        className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                          isActive
-                            ? "bg-primary text-primary-foreground"
-                            : isDone
-                            ? "bg-primary/10 text-primary"
-                            : "bg-muted text-muted-foreground"
-                        }`}
-                      >
-                        <span className="w-4 h-4 rounded-full bg-background/30 flex items-center justify-center text-[10px] font-semibold">
-                          {isDone ? <Check className="w-3 h-3" /> : i + 1}
-                        </span>
-                        {s}
-                      </div>
-                      {i < STEPS.length - 1 && (
-                        <div className="flex-1 h-px bg-border" />
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-              <div className="text-xs text-muted-foreground mt-3">{helperText}</div>
+              <div className="text-sm font-semibold text-foreground mb-1">{infoBlock.title}</div>
+              <div className="text-xs text-muted-foreground leading-relaxed">{infoBlock.text}</div>
             </div>
 
             {/* Risk list */}
