@@ -20,11 +20,17 @@ import StatusBadge from "@/components/StatusBadge";
 import {
   agents,
   versionHistory,
+  agentVersions,
   type Risk,
   type RiskFactor,
   type RiskMeasure,
   type AgentCardStatus,
+  type WorkflowEvent,
+  type WorkflowActor,
+  type AgentVersionHistory,
 } from "@/data/mockData";
+import { History, FileText, ArrowRight } from "lucide-react";
+
 
 // --- Локальные конфиги статусов ---
 
