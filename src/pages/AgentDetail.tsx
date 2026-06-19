@@ -13,7 +13,11 @@ import {
   CheckCircle2,
   ChevronDown,
   ArrowLeftRight,
+  History,
+  FileText,
+  ArrowRight,
 } from "lucide-react";
+
 import AppLayout from "@/components/AppLayout";
 import RiskBadge from "@/components/RiskBadge";
 import StatusBadge from "@/components/StatusBadge";
