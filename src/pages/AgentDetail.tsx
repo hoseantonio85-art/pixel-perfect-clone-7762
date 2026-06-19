@@ -191,16 +191,24 @@ const AgentDetail = () => {
 
   const saveDispute = (comment: string) => {
     if (!selectedRisk) return;
+    const wasDispute = selectedRisk.ownerAction === "dispute";
     setRisks((prev) =>
       prev.map((r) =>
         r.id === selectedRisk.id
-
           ? { ...r, ownerAction: "dispute", ownerActionComment: comment }
           : r
       )
     );
+    addEvent({
+      type: wasDispute ? "dispute_updated" : "risk_disputed",
+      title: wasDispute ? "Спор изменён" : "Оспорена оценка риска",
+      actor: ownerActor,
+      risk: { id: selectedRisk.id, code: selectedRisk.code, title: selectedRisk.title },
+      comment,
+    });
     setShowDisputeForm(false);
   };
+
 
   // Информационный блок над списком рисков
   const infoBlock = (() => {
