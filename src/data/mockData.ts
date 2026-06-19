@@ -470,3 +470,152 @@ export const versionHistory: VersionHistory[] = [
   { version: "Версия 3.3", status: "Архив", riskLevel: "Низкий", bigRisks: 5, smallRisks: 3 },
   { version: "Версия 3.2", status: "Архив", riskLevel: "Низкий", bigRisks: 5, smallRisks: 3 },
 ];
+
+// ====== История агента (workflow) ======
+
+export interface WorkflowActor {
+  id: string;
+  name: string;
+  role: string;
+}
+
+export interface WorkflowAttachment {
+  id: string;
+  name: string;
+  size?: string;
+}
+
+export interface WorkflowChange {
+  field: string;
+  label: string;
+  before?: string;
+  after?: string;
+}
+
+export type WorkflowEventType =
+  | "version_created"
+  | "version_activated"
+  | "version_archived"
+  | "evaluation_started"
+  | "evaluation_completed"
+  | "risk_disputed"
+  | "dispute_updated"
+  | "dispute_cancelled"
+  | "sent_to_arbitration"
+  | "proposal_accepted"
+  | "proposal_rejected"
+  | "risk_level_changed"
+  | "applicability_changed"
+  | "risk_accepted"
+  | "acceptance_document_added"
+  | "acceptance_document_replaced"
+  | "sent_for_approval"
+  | "returned_for_revision"
+  | "resent"
+  | "approved"
+  | "corrected";
+
+export interface WorkflowEvent {
+  id: string;
+  agentId: string;
+  versionId: string;
+  type: WorkflowEventType;
+  title: string;
+  actor: WorkflowActor;
+  createdAt: string;
+  statusBefore?: string;
+  statusAfter?: string;
+  comment?: string;
+  risk?: { id: string; code: string; title: string };
+  changes?: WorkflowChange[];
+  attachments?: WorkflowAttachment[];
+  metadata?: {
+    expiresAt?: string;
+    approver?: string;
+    disputedRisksCount?: number;
+    basis?: string;
+  };
+}
+
+export interface AgentVersionHistory {
+  id: string;
+  agentId: string;
+  version: string;
+  versionStatus: "Текущая" | "Пром" | "Разработка" | "Архив";
+  isCurrent: boolean;
+  createdAt: string;
+  evaluatedAt?: string;
+  cardStatus: AgentCardStatus;
+  overallRiskLevel: "critical" | "high" | "medium" | "low";
+  riskSummary: {
+    total: number;
+    critical: number;
+    high: number;
+    medium: number;
+    low: number;
+    disputed: number;
+  };
+  riskAcceptance?: {
+    accepted: boolean;
+    acceptedAt?: string;
+    acceptedBy?: string;
+    documentName?: string;
+    expiresAt?: string;
+  };
+  events: WorkflowEvent[];
+}
+
+const _owner: WorkflowActor = { id: "u1", name: "Майерз Михаил Николаевич", role: "Владелец агента" };
+const _rm: WorkflowActor = { id: "u2", name: "Михайлова Екатерина", role: "Риск-менеджер" };
+const _resp: WorkflowActor = { id: "u3", name: "Вурхиз Николай Николаевич", role: "Ответственный" };
+const _ai: WorkflowActor = { id: "ai", name: "AI-оценка", role: "Система" };
+const _riskRef = { id: "r1", code: "CRA-12323", title: "Отказ инфраструктуры ИИ - платформ и сервисов" };
+
+export const agentVersions: Record<string, AgentVersionHistory[]> = {
+  "1": [
+    {
+      id: "v1.2", agentId: "1", version: "1.2", versionStatus: "Разработка", isCurrent: true,
+      createdAt: "2026-06-15T09:00:00", evaluatedAt: "2026-06-17T12:10:00",
+      cardStatus: "approval", overallRiskLevel: "high",
+      riskSummary: { total: 18, critical: 0, high: 2, medium: 6, low: 10, disputed: 1 },
+      events: [
+        { id: "e1", agentId: "1", versionId: "v1.2", type: "version_created", title: "Версия создана", actor: _resp, createdAt: "2026-06-15T09:00:00" },
+        { id: "e2", agentId: "1", versionId: "v1.2", type: "evaluation_started", title: "Оценка запущена", actor: _owner, createdAt: "2026-06-17T11:40:00", statusBefore: "Нет оценки", statusAfter: "В оценке" },
+        { id: "e3", agentId: "1", versionId: "v1.2", type: "evaluation_completed", title: "Оценка завершена", actor: _ai, createdAt: "2026-06-17T12:10:00", statusBefore: "В оценке", statusAfter: "Готово" },
+        { id: "e4", agentId: "1", versionId: "v1.2", type: "risk_disputed", title: "Оспорена оценка риска", actor: _owner, createdAt: "2026-06-18T13:48:00", risk: _riskRef, changes: [{ field: "level", label: "Уровень риска", before: "Высокий", after: "Средний" }], comment: "Уровень завышен, есть компенсирующая мера." },
+        { id: "e5", agentId: "1", versionId: "v1.2", type: "sent_to_arbitration", title: "Отправлено на арбитраж", actor: _owner, createdAt: "2026-06-18T14:05:00", statusBefore: "Есть спор", statusAfter: "Арбитраж", metadata: { disputedRisksCount: 1 } },
+        { id: "e6", agentId: "1", versionId: "v1.2", type: "proposal_rejected", title: "Предложение отклонено", actor: _rm, createdAt: "2026-06-18T15:10:00", risk: _riskRef, comment: "Компенсирующая мера не покрывает риск полностью." },
+        { id: "e7", agentId: "1", versionId: "v1.2", type: "corrected", title: "Оценка скорректирована", actor: _rm, createdAt: "2026-06-18T15:20:00", statusBefore: "Арбитраж", statusAfter: "Скорректировано" },
+        { id: "e8", agentId: "1", versionId: "v1.2", type: "sent_for_approval", title: "Отправлено на согласование", actor: _owner, createdAt: "2026-06-18T14:32:00", statusBefore: "Готово", statusAfter: "Согласование", comment: "Оценка направлена в УОР и Кибербезопасность." },
+      ],
+    },
+    {
+      id: "v1.1", agentId: "1", version: "1.1", versionStatus: "Пром", isCurrent: false,
+      createdAt: "2026-03-01T10:00:00", evaluatedAt: "2026-03-05T11:00:00",
+      cardStatus: "approved", overallRiskLevel: "medium",
+      riskSummary: { total: 18, critical: 0, high: 0, medium: 5, low: 13, disputed: 0 },
+      events: [
+        { id: "v11-1", agentId: "1", versionId: "v1.1", type: "version_created", title: "Версия создана", actor: _resp, createdAt: "2026-03-01T10:00:00" },
+        { id: "v11-2", agentId: "1", versionId: "v1.1", type: "evaluation_completed", title: "Оценка завершена", actor: _ai, createdAt: "2026-03-05T11:00:00", statusBefore: "В оценке", statusAfter: "Готово" },
+        { id: "v11-3", agentId: "1", versionId: "v1.1", type: "sent_for_approval", title: "Отправлено на согласование", actor: _owner, createdAt: "2026-03-10T09:20:00", statusBefore: "Готово", statusAfter: "Согласование" },
+        { id: "v11-4", agentId: "1", versionId: "v1.1", type: "approved", title: "Карточка согласована", actor: _rm, createdAt: "2026-03-12T16:00:00", statusBefore: "Согласование", statusAfter: "Согласовано" },
+      ],
+    },
+    {
+      id: "v1.0", agentId: "1", version: "1.0", versionStatus: "Архив", isCurrent: false,
+      createdAt: "2025-09-24T10:00:00", evaluatedAt: "2025-10-01T12:00:00",
+      cardStatus: "approved", overallRiskLevel: "high",
+      riskSummary: { total: 18, critical: 0, high: 3, medium: 7, low: 8, disputed: 1 },
+      riskAcceptance: { accepted: true, acceptedAt: "2025-10-15T15:26:00", acceptedBy: "Майерз М. Н.", documentName: "Решение_КРГ_15-10-2025.pdf", expiresAt: "2026-04-15" },
+      events: [
+        { id: "v10-1", agentId: "1", versionId: "v1.0", type: "version_created", title: "Версия создана", actor: _resp, createdAt: "2025-09-24T10:00:00" },
+        { id: "v10-2", agentId: "1", versionId: "v1.0", type: "evaluation_completed", title: "Оценка завершена", actor: _ai, createdAt: "2025-10-01T12:00:00", statusBefore: "В оценке", statusAfter: "Готово" },
+        { id: "v10-3", agentId: "1", versionId: "v1.0", type: "risk_disputed", title: "Оспорена оценка риска", actor: _owner, createdAt: "2025-10-05T11:00:00", risk: _riskRef, comment: "Завышен уровень." },
+        { id: "v10-4", agentId: "1", versionId: "v1.0", type: "sent_to_arbitration", title: "Отправлено на арбитраж", actor: _owner, createdAt: "2025-10-05T11:30:00", statusBefore: "Есть спор", statusAfter: "Арбитраж", metadata: { disputedRisksCount: 1 } },
+        { id: "v10-5", agentId: "1", versionId: "v1.0", type: "risk_accepted", title: "Риск принят", actor: _owner, createdAt: "2025-10-15T15:26:00", attachments: [{ id: "a1", name: "Решение_КРГ_15-10-2025.pdf", size: "1.2 Мб" }], metadata: { expiresAt: "до 15 апреля 2026", approver: "КРГ", basis: "Продолжить эксплуатацию агента при текущем уровне риска." } },
+        { id: "v10-6", agentId: "1", versionId: "v1.0", type: "approved", title: "Карточка согласована", actor: _rm, createdAt: "2025-10-16T10:00:00", statusBefore: "Согласование", statusAfter: "Согласовано" },
+      ],
+    },
+  ],
+};
+
