@@ -99,6 +99,49 @@ const AgentDetail = () => {
   const [showSendModal, setShowSendModal] = useState(false);
   const [showDisputeForm, setShowDisputeForm] = useState(false);
 
+  // --- История агента ---
+  const versionsList: AgentVersionHistory[] = agentVersions[id ?? ""] ?? [];
+  const currentVersion = versionsList.find((v) => v.isCurrent) ?? versionsList[0];
+
+  const [historyOpen, setHistoryOpen] = useState(false);
+  const [historyMode, setHistoryMode] = useState<"current" | "all">("current");
+  const [historyVersionId, setHistoryVersionId] = useState<string | null>(
+    currentVersion?.id ?? null
+  );
+  const [extraEvents, setExtraEvents] = useState<Record<string, WorkflowEvent[]>>({});
+
+  const ownerActor: WorkflowActor = {
+    id: "u1",
+    name: "Майерз Михаил Николаевич",
+    role: "Владелец агента",
+  };
+
+  const addEvent = (e: Omit<WorkflowEvent, "id" | "agentId" | "versionId" | "createdAt"> & { createdAt?: string }) => {
+    if (!currentVersion) return;
+    const evt: WorkflowEvent = {
+      id: `e-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      agentId: id ?? "",
+      versionId: currentVersion.id,
+      createdAt: e.createdAt ?? new Date().toISOString(),
+      ...e,
+    };
+    setExtraEvents((prev) => ({
+      ...prev,
+      [currentVersion.id]: [...(prev[currentVersion.id] ?? []), evt],
+    }));
+  };
+
+  const eventsForVersion = (v: AgentVersionHistory): WorkflowEvent[] => {
+    const extra = extraEvents[v.id] ?? [];
+    return [...v.events, ...extra].sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+  };
+
+  const lastEvent: WorkflowEvent | undefined = currentVersion
+    ? eventsForVersion(currentVersion)[0]
+    : undefined;
+
   if (!baseAgent) return null;
   const agent = baseAgent;
 
@@ -127,6 +170,8 @@ const AgentDetail = () => {
   const handleMainAction = () => {
     if (mainAction.disabled) return;
     if (mainAction.label === "Оценить") {
+      addEvent({ type: "evaluation_started", title: "Оценка запущена", actor: ownerActor, statusBefore: "Нет оценки", statusAfter: "В оценке" });
+      addEvent({ type: "evaluation_completed", title: "Оценка завершена", actor: { id: "ai", name: "AI-оценка", role: "Система" }, statusBefore: "В оценке", statusAfter: "Готово" });
       setBaseStatus("ready");
       return;
     }
@@ -134,7 +179,13 @@ const AgentDetail = () => {
   };
 
   const confirmSend = () => {
-    setBaseStatus(disputeCount > 0 ? "arbitration" : "approval");
+    const disputed = disputeCount > 0;
+    setBaseStatus(disputed ? "arbitration" : "approval");
+    if (disputed) {
+      addEvent({ type: "sent_to_arbitration", title: "Отправлено на арбитраж", actor: ownerActor, statusBefore: "Есть спор", statusAfter: "Арбитраж", metadata: { disputedRisksCount: disputeCount } });
+    } else {
+      addEvent({ type: "sent_for_approval", title: "Отправлено на согласование", actor: ownerActor, statusBefore: "Готово", statusAfter: "Согласование" });
+    }
     setShowSendModal(false);
   };
 
@@ -143,6 +194,7 @@ const AgentDetail = () => {
     setRisks((prev) =>
       prev.map((r) =>
         r.id === selectedRisk.id
+
           ? { ...r, ownerAction: "dispute", ownerActionComment: comment }
           : r
       )
