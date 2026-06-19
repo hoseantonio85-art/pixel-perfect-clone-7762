@@ -713,11 +713,12 @@ const AgentDetail = () => {
                   </button>
 
                   <button
-                    onClick={() => setShowVersionHistory(true)}
+                    onClick={() => { setShowVersionDetail(false); setHistoryMode("all"); setHistoryOpen(true); }}
                     className="w-full mt-3 text-sm text-primary hover:underline"
                   >
-                    История версий →
+                    История агента →
                   </button>
+
                 </>
               ) : (
                 <>
