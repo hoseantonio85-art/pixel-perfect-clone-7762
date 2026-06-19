@@ -954,3 +954,335 @@ const FactorsList = ({ factors, measures }: { factors: RiskFactor[]; measures: R
 };
 
 export default AgentDetail;
+
+// ============ История агента: хелперы и компонент ============
+
+function shortName(full: string): string {
+  const parts = full.trim().split(/\s+/);
+  if (parts.length === 1) return parts[0];
+  const [last, ...rest] = parts;
+  const initials = rest.map((p) => p[0] + ".").join(" ");
+  return `${last} ${initials}`;
+}
+
+function formatDateTime(iso: string): string {
+  const d = new Date(iso);
+  const months = ["янв", "фев", "мар", "апр", "мая", "июн", "июл", "авг", "сен", "окт", "ноя", "дек"];
+  const day = d.getDate();
+  const month = months[d.getMonth()];
+  const hh = String(d.getHours()).padStart(2, "0");
+  const mm = String(d.getMinutes()).padStart(2, "0");
+  return `${day} ${month}, ${hh}:${mm}`;
+}
+
+function formatDateLong(iso: string): string {
+  const d = new Date(iso);
+  const months = ["января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"];
+  return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}, ${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+}
+
+const riskLevelRu: Record<"critical" | "high" | "medium" | "low", string> = {
+  critical: "Очень высокий",
+  high: "Высокий",
+  medium: "Средний",
+  low: "Низкий",
+};
+
+const cardStatusRu: Record<AgentCardStatus, string> = {
+  no_eval: "Нет оценки",
+  in_eval: "В оценке",
+  ready: "Готово",
+  dispute: "Есть спор",
+  arbitration: "Арбитраж",
+  approval: "Согласование",
+  approved: "Согласовано",
+  corrected: "Скорректировано",
+};
+
+type HistoryDrawerProps = {
+  agentName: string;
+  versions: AgentVersionHistory[];
+  eventsFor: (v: AgentVersionHistory) => WorkflowEvent[];
+  mode: "current" | "all";
+  setMode: (m: "current" | "all") => void;
+  versionId: string | null;
+  setVersionId: (id: string | null) => void;
+  onClose: () => void;
+  onOpenRisk: (riskId: string) => void;
+};
+
+const HistoryDrawer = ({
+  agentName,
+  versions,
+  eventsFor,
+  mode,
+  setMode,
+  versionId,
+  setVersionId,
+  onClose,
+  onOpenRisk,
+}: HistoryDrawerProps) => {
+  const current = versions.find((v) => v.isCurrent) ?? versions[0];
+  const activeVersion =
+    mode === "current"
+      ? current
+      : versions.find((v) => v.id === versionId) ?? null;
+
+  // В режиме "all" если выбрана конкретная версия — показываем её историю с кнопкой «Назад»
+  const showVersionDetailView = mode === "all" && activeVersion !== null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex">
+      <div className="flex-1 bg-foreground/20" onClick={onClose} />
+      <div className="w-[640px] bg-card shadow-2xl animate-slide-in-right overflow-y-auto">
+        <div className="p-6">
+          <div className="flex items-start justify-between mb-4">
+            <div>
+              <h2 className="text-xl font-bold text-foreground">История агента</h2>
+              <div className="text-sm text-muted-foreground mt-1">{agentName}</div>
+              {current && (
+                <div className="text-xs text-muted-foreground mt-1">
+                  Текущая версия {current.version}
+                </div>
+              )}
+            </div>
+            <button onClick={onClose} className="text-muted-foreground hover:text-foreground">
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
+          {/* Toggle */}
+          <div className="inline-flex rounded-lg border border-border p-1 mb-5 bg-muted/40">
+            <button
+              onClick={() => { setMode("current"); setVersionId(current?.id ?? null); }}
+              className={`px-3 py-1.5 text-sm rounded-md transition-colors ${mode === "current" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"}`}
+            >
+              Текущая версия
+            </button>
+            <button
+              onClick={() => { setMode("all"); setVersionId(null); }}
+              className={`px-3 py-1.5 text-sm rounded-md transition-colors ${mode === "all" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"}`}
+            >
+              Все версии
+            </button>
+          </div>
+
+          {mode === "current" && current && (
+            <VersionSummary v={current} />
+          )}
+
+          {mode === "current" && current && (
+            <>
+              <h3 className="text-sm font-semibold text-foreground mt-6 mb-3">История изменений</h3>
+              <Timeline events={eventsFor(current)} onOpenRisk={onOpenRisk} />
+            </>
+          )}
+
+          {mode === "all" && !showVersionDetailView && (
+            <div className="space-y-3">
+              {versions.map((v) => {
+                const last = eventsFor(v)[0];
+                return (
+                  <div key={v.id} className="rounded-xl border border-border p-4 bg-card">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-semibold text-foreground">Версия {v.version}</span>
+                        {v.isCurrent ? (
+                          <span className="text-[11px] px-2 py-0.5 rounded-full bg-primary/10 text-primary">Текущая</span>
+                        ) : (
+                          <span className="text-[11px] px-2 py-0.5 rounded-full bg-muted text-muted-foreground">Архив</span>
+                        )}
+                        <span className="text-[11px] px-2 py-0.5 rounded-full border border-border text-muted-foreground">
+                          {v.versionStatus}
+                        </span>
+                      </div>
+                      <span className="text-xs text-muted-foreground">{riskLevelRu[v.overallRiskLevel]} уровень</span>
+                    </div>
+                    <div className="text-xs text-muted-foreground mb-2">
+                      {v.riskSummary.total} рисков · {v.riskSummary.high} высоких · {v.riskSummary.medium} средних · {v.riskSummary.low} низких
+                      {v.riskSummary.disputed > 0 && <> · {v.riskSummary.disputed} спор</>}
+                    </div>
+                    <div className="text-xs text-muted-foreground mb-3">
+                      Статус: {cardStatusRu[v.cardStatus]}
+                      {v.riskAcceptance?.accepted ? " · Риск принят" : ""}
+                    </div>
+                    {last && (
+                      <div className="text-xs text-muted-foreground mb-3 border-t border-border pt-2">
+                        Последнее действие: <span className="text-foreground font-medium">{last.title}</span>
+                        <div className="text-[11px] text-muted-foreground/80">{formatDateLong(last.createdAt)}</div>
+                      </div>
+                    )}
+                    <button
+                      onClick={() => setVersionId(v.id)}
+                      className="text-sm text-primary hover:underline inline-flex items-center gap-1"
+                    >
+                      Открыть историю <ArrowRight className="w-4 h-4" />
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {showVersionDetailView && activeVersion && (
+            <>
+              <button
+                onClick={() => setVersionId(null)}
+                className="text-sm text-muted-foreground hover:text-foreground inline-flex items-center gap-1 mb-3"
+              >
+                <ArrowLeft className="w-4 h-4" /> Ко всем версиям
+              </button>
+              <VersionSummary v={activeVersion} />
+              <h3 className="text-sm font-semibold text-foreground mt-6 mb-3">История изменений</h3>
+              <Timeline events={eventsFor(activeVersion)} onOpenRisk={onOpenRisk} />
+            </>
+          )}
+
+          {versions.length === 0 && (
+            <div className="text-sm text-muted-foreground">Действий пока нет.</div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const VersionSummary = ({ v }: { v: AgentVersionHistory }) => (
+  <div className="rounded-xl border border-border p-4 bg-card">
+    <div className="flex items-center gap-2 mb-3">
+      <span className="text-base font-semibold text-foreground">Версия {v.version}</span>
+      {v.isCurrent ? (
+        <span className="text-[11px] px-2 py-0.5 rounded-full bg-primary/10 text-primary">Текущая</span>
+      ) : (
+        <span className="text-[11px] px-2 py-0.5 rounded-full bg-muted text-muted-foreground">Архив</span>
+      )}
+      <span className="text-[11px] px-2 py-0.5 rounded-full border border-border text-muted-foreground">
+        {v.versionStatus}
+      </span>
+    </div>
+    <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-xs">
+      <div className="text-muted-foreground">Общий уровень</div>
+      <div className="text-foreground font-medium text-right">{riskLevelRu[v.overallRiskLevel]}</div>
+
+      <div className="text-muted-foreground">Всего рисков</div>
+      <div className="text-foreground font-medium text-right">{v.riskSummary.total}</div>
+
+      <div className="text-muted-foreground">Очень высоких</div>
+      <div className="text-foreground text-right">{v.riskSummary.critical}</div>
+
+      <div className="text-muted-foreground">Высоких</div>
+      <div className="text-foreground text-right">{v.riskSummary.high}</div>
+
+      <div className="text-muted-foreground">Средних</div>
+      <div className="text-foreground text-right">{v.riskSummary.medium}</div>
+
+      <div className="text-muted-foreground">Низких</div>
+      <div className="text-foreground text-right">{v.riskSummary.low}</div>
+
+      <div className="text-muted-foreground">Спорных</div>
+      <div className="text-foreground text-right">{v.riskSummary.disputed}</div>
+
+      <div className="text-muted-foreground">Статус</div>
+      <div className="text-foreground font-medium text-right">{cardStatusRu[v.cardStatus]}</div>
+
+      <div className="text-muted-foreground">Принятие риска</div>
+      <div className="text-foreground text-right">
+        {v.riskAcceptance?.accepted ? "Зафиксировано" : "Не зафиксировано"}
+      </div>
+    </div>
+  </div>
+);
+
+const Timeline = ({
+  events,
+  onOpenRisk,
+}: {
+  events: WorkflowEvent[];
+  onOpenRisk: (riskId: string) => void;
+}) => {
+  if (events.length === 0) {
+    return <div className="text-sm text-muted-foreground">Действий пока нет.</div>;
+  }
+  return (
+    <div className="relative pl-5 border-l border-border space-y-5">
+      {events.map((e) => (
+        <div key={e.id} className="relative">
+          <span className="absolute -left-[23px] top-1.5 w-2.5 h-2.5 rounded-full bg-primary/70 border-2 border-card" />
+          <div className="text-sm font-medium text-foreground leading-snug">{e.title}</div>
+
+          {(e.statusBefore || e.statusAfter) && (
+            <div className="text-xs text-muted-foreground mt-0.5">
+              {e.statusBefore} {e.statusBefore && e.statusAfter && "→"} {e.statusAfter}
+            </div>
+          )}
+
+          {e.risk && (
+            <button
+              onClick={() => onOpenRisk(e.risk!.id)}
+              className="mt-1.5 block text-left hover:underline"
+            >
+              <span className="text-xs text-muted-foreground">{e.risk.code}</span>{" "}
+              <span className="text-xs text-foreground">{e.risk.title}</span>
+            </button>
+          )}
+
+          {e.changes && e.changes.length > 0 && (
+            <div className="mt-1.5 text-xs text-muted-foreground space-y-0.5">
+              {e.changes.map((c, i) => (
+                <div key={i}>
+                  {c.label}: <span className="text-foreground">{c.before ?? "—"}</span> → <span className="text-foreground">{c.after ?? "—"}</span>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <div className="text-xs text-muted-foreground mt-1">
+            {shortName(e.actor.name)} · {e.actor.role}
+          </div>
+          <div className="text-[11px] text-muted-foreground">
+            {formatDateLong(e.createdAt)}
+          </div>
+
+          {e.comment && (
+            <div className="mt-2 text-xs text-foreground bg-muted/50 rounded-md px-3 py-2 leading-relaxed">
+              {e.comment}
+            </div>
+          )}
+
+          {e.attachments && e.attachments.length > 0 && (
+            <div className="mt-2 space-y-1">
+              {e.attachments.map((a) => (
+                <button
+                  key={a.id}
+                  className="w-full flex items-center justify-between text-xs bg-muted/50 hover:bg-muted rounded-md px-3 py-2 transition-colors"
+                >
+                  <span className="flex items-center gap-2 text-foreground">
+                    <FileText className="w-3.5 h-3.5 text-muted-foreground" />
+                    {a.name}
+                  </span>
+                  {a.size && <span className="text-muted-foreground">{a.size}</span>}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {e.metadata?.expiresAt && (
+            <div className="text-[11px] text-muted-foreground mt-1">
+              Срок действия: {e.metadata.expiresAt}
+            </div>
+          )}
+          {e.metadata?.basis && (
+            <div className="text-[11px] text-muted-foreground mt-1">
+              Основание: {e.metadata.basis}
+            </div>
+          )}
+          {e.metadata?.disputedRisksCount !== undefined && (
+            <div className="text-[11px] text-muted-foreground mt-1">
+              Спорных рисков: {e.metadata.disputedRisksCount}
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+};
