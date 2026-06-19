@@ -33,7 +33,7 @@ import {
   type WorkflowActor,
   type AgentVersionHistory,
 } from "@/data/mockData";
-import { History, FileText, ArrowRight } from "lucide-react";
+
 
 
 // --- Локальные конфиги статусов ---
