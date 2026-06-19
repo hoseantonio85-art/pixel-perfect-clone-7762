@@ -419,6 +419,35 @@ const AgentDetail = () => {
                 </button>
               </div>
 
+              {/* Последнее действие */}
+              {lastEvent && (
+                <div className="bg-card rounded-xl border border-border p-5">
+                  <div className="flex items-center gap-2 mb-3">
+                    <History className="w-4 h-4 text-muted-foreground" />
+                    <h3 className="text-sm font-semibold text-foreground">Последнее действие</h3>
+                  </div>
+                  <div className="text-sm font-medium text-foreground mb-1 leading-snug">
+                    {lastEvent.title}
+                  </div>
+                  <div className="text-xs text-muted-foreground mb-2">
+                    {shortName(lastEvent.actor.name)} · {formatDateTime(lastEvent.createdAt)}
+                  </div>
+                  {lastEvent.comment && (
+                    <div className="text-xs text-muted-foreground line-clamp-2 mb-3 italic">
+                      «{lastEvent.comment}»
+                    </div>
+                  )}
+                  <button
+                    onClick={() => { setHistoryMode("current"); setHistoryVersionId(currentVersion?.id ?? null); setHistoryOpen(true); }}
+                    className="w-full flex items-center justify-between text-sm text-primary hover:underline border-t border-border pt-3"
+                  >
+                    <span>Посмотреть историю</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
+
+
               {/* Actions */}
               <div className="bg-card rounded-xl border border-border p-5 space-y-2">
                 <div className="flex gap-2">
