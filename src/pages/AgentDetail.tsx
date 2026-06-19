@@ -758,9 +758,25 @@ const AgentDetail = () => {
           </div>
         </div>
       )}
+
+      {/* История агента */}
+      {historyOpen && (
+        <HistoryDrawer
+          agentName={agent.name}
+          versions={versionsList}
+          eventsFor={eventsForVersion}
+          mode={historyMode}
+          setMode={setHistoryMode}
+          versionId={historyVersionId}
+          setVersionId={setHistoryVersionId}
+          onClose={() => setHistoryOpen(false)}
+          onOpenRisk={(rid) => setSelectedRiskId(rid)}
+        />
+      )}
     </AppLayout>
   );
 };
+
 
 const InfoRow = ({ label, value }: { label: string; value: string }) => (
   <div className="flex justify-between">
